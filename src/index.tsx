@@ -44,7 +44,7 @@ window.addEventListener('resize', () => {
     shadows: 'soft',
     camera: {
       fov: 50,
-      position: [5, 2, 10],
+      position: [50, 20, 20],
     },
     size: { top: 0, left: 0, width: window.innerWidth, height: window.innerHeight },
   })

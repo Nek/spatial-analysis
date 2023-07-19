@@ -1,6 +1,6 @@
 import { OrbitControls } from '@react-three/drei'
 import { extend, useFrame } from '@react-three/fiber'
-import { type PropsWithChildren, createRef, Suspense, useEffect, useState, useLayoutEffect } from 'react'
+import { createRef, Suspense, useEffect, useState, useLayoutEffect } from 'react'
 import {
   AmbientLight,
   BufferGeometry,
@@ -39,7 +39,7 @@ function Light() {
 }
 
 function CaffeineMolecule() {
-  const caffeineData = useLoader(PDBLoader, '/caffeine.pdb')
+  const caffeineData = useLoader(PDBLoader, '/protein.pdb')
 
   const [molecules, setMolecules] = useState<{position: [number, number, number], color: [number, number, number]}[]>([])
 
@@ -85,14 +85,9 @@ function CaffeineMolecule() {
 }
 
 function Scene() {
-
-  const OrbitControls3D = OrbitControls as (
-    props: PropsWithChildren<(typeof OrbitControls)['defaultProps']>,
-    deprecatedLegacyContext?: any,
-  ) => JSX.Element
   return (
     <>
-      <OrbitControls3D makeDefault />
+      <OrbitControls makeDefault />
       <Light />
       <ambientLight intensity={0.2} />
       <Suspense fallback={null}>
