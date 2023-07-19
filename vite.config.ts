@@ -10,5 +10,14 @@ export default defineConfig({
       'react-reconciler': 'preact-reconciler',
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          three: ['three'],
+        },
+      },
+    },
+  },
   plugins: [preact()],
 })

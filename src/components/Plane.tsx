@@ -1,6 +1,6 @@
 import { extend } from "@react-three/fiber"
-import { PlaneGeometry } from "three"
-extend({ PlaneGeometry })
+import { PlaneGeometry, MeshStandardMaterial } from "three"
+extend({ PlaneGeometry, MeshStandardMaterial })
 
 
 function Plane() {
