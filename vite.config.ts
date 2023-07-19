@@ -8,6 +8,7 @@ export default defineConfig({
       react: 'preact/compat',
       'react-dom': 'preact/compat',
       'react-reconciler': 'preact-reconciler',
+      'react/jsx-runtime': 'preact/jsx-runtime',
     },
   },
   build: {

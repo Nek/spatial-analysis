@@ -33,7 +33,7 @@ const root = createRoot(document.getElementById('root') as HTMLCanvasElement)
 
 // createRoot by design is not responsive, you have to take care of resize yourself
 window.addEventListener('resize', () => {
-  root.configure({ 
+  root.configure({
     events,
     dpr: [1, 2],
     gl: {
@@ -41,12 +41,12 @@ window.addEventListener('resize', () => {
       toneMapping: ACESFilmicToneMapping,
       outputColorSpace: SRGBColorSpace,
     },
-    shadows: "soft",
+    shadows: 'soft',
     camera: {
       fov: 50,
       position: [5, 2, 10],
     },
-    size: { top: 0, left: 0, width: window.innerWidth, height: window.innerHeight } 
+    size: { top: 0, left: 0, width: window.innerWidth, height: window.innerHeight },
   })
   root.render(<Scene />)
 })
