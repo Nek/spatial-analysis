@@ -1,34 +1,30 @@
 {
   "name": "0x-protein",
-  "private": true,
   "version": "0.0.1",
-  "type": "module",
+  "description": "Protein vis.",
+  "sideEffects": false,
+  "devDependencies": {
+    "@preact/preset-vite": "^2.5.0",
+    "@types/react": "^18.2.15",
+    "@types/react-dom": "^18.2.7",
+    "@types/three": "^0.154.0",
+    "typescript": "^5.1.6",
+    "vite": "^4.1.4",
+    "vite-bundle-visualizer": "^0.8.0"
+  },
+  "peerDependencies": {
+    "preact": ">=10"
+  },
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview"
+    "build": "vite build && tsc",
+    "analyze": "vite-bundle-visualizer dist --port 5000"
   },
   "dependencies": {
     "@react-three/drei": "^9.79.0",
     "@react-three/fiber": "^8.13.5",
-    "leva": "^0.9.35",
-    "preact": "^10.16.0",
+    "preact": "^10.15.0",
     "preact-reconciler": "^0.1.6",
-    "r3f-perf": "^7.1.2",
     "three": "^0.154.0"
-  },
-  "devDependencies": {
-    "@babel/plugin-transform-react-jsx-source": "^7.22.5",
-    "@preact/preset-vite": "^2.5.0",
-    "@types/three": "^0.154.0",
-    "@vitejs/plugin-react": "^4.0.3",
-    "typescript": "^5.1.6",
-    "vite": "^4.4.4"
-  },
-  "prettier": {
-    "singleQuote": true,
-    "semi": false,
-    "printWidth": 90,
-    "jsxSingleQuote": true
   }
 }
