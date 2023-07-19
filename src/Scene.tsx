@@ -18,7 +18,7 @@ function Light() {
 function Scene() {
   const cubeRef = createRef<CubeType>()
   useFrame((_, delta) => {
-    cubeRef.current!.rotation.y += delta / 3
+    if (cubeRef.current) cubeRef.current.rotation.y += delta / 3
   })
   const OrbitControls3D = OrbitControls as (props: PropsWithChildren<typeof OrbitControls['defaultProps']>, deprecatedLegacyContext?: any) => JSX.Element
   return (

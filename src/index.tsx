@@ -6,11 +6,9 @@ import {
   AmbientLight,
   SpotLight,
   ACESFilmicToneMapping,
-  sRGBEncoding,
   CylinderGeometry,
   ConeGeometry,
   MeshBasicMaterial,
-  PCFSoftShadowMap,
   SRGBColorSpace,
 } from 'three'
 import { extend, createRoot, events } from '@react-three/fiber'
@@ -48,8 +46,9 @@ window.addEventListener('resize', () => {
       fov: 50,
       position: [5, 2, 10],
     },
-    size: { top: 0, left: 0, width: window.innerWidth, height: window.innerHeight } })
-    root.render(<Scene />)
+    size: { top: 0, left: 0, width: window.innerWidth, height: window.innerHeight } 
+  })
+  root.render(<Scene />)
 })
 
 // Trigger resize
