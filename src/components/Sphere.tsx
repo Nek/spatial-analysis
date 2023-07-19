@@ -11,7 +11,7 @@ function Sphere() {
   const PivotControls3D = PivotControls as (props: PropsWithChildren<typeof PivotControls['defaultProps']>, deprecatedLegacyContext?: any) => JSX.Element
 
   return (
-    <PivotControls3D anchor={[0, 0, 0]} depthTest={false} visible={true} ref={pivotRef}>
+    <PivotControls3D anchor={[0, 0, 0]} depthTest={false} visible ref={pivotRef}>
       <mesh position={[0,0,0]} ref={sphereRef} castShadow>
         <sphereGeometry args={[1, 30, 30]} />
         <meshStandardMaterial color={[1,0,0]} />
