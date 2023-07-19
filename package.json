@@ -11,16 +11,16 @@
   "dependencies": {
     "@react-three/drei": "^9.79.0",
     "@react-three/fiber": "^8.13.5",
-    "@types/three": "^0.154.0",
     "leva": "^0.9.35",
+    "preact": "^10.16.0",
+    "preact-reconciler": "^0.1.6",
     "r3f-perf": "^7.1.2",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
     "three": "^0.154.0"
   },
   "devDependencies": {
-    "@types/react": "^18.2.15",
-    "@types/react-dom": "^18.2.7",
+    "@babel/plugin-transform-react-jsx-source": "^7.22.5",
+    "@preact/preset-vite": "^2.5.0",
+    "@types/three": "^0.154.0",
     "@vitejs/plugin-react": "^4.0.3",
     "typescript": "^5.1.6",
     "vite": "^4.4.4"
