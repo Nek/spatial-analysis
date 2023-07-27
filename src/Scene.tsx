@@ -57,27 +57,13 @@ type Cell = Color[]
 
 type AtomJSON = [number, number, number, [number, number, number]]
 
-function CaffeineMolecule() {
-  const depth = 3
 
+function marchCubes({ positions, colors }: { positions: Vector3[]; colors: Color[] }, depth: number): { octree: Octree<Cell>; texture3D: ImageData[]} {
   const maxDim = Math.pow(2, depth)
+  const level = 0
 
-  const caffeineData = useLoader(PDBLoader, '/protein.pdb')
-
-  const [molecules, setMolecules] = useState<Octree<Cell>>()
-
-  const ref = createRef()
-
-  function pointsToField(points: AtomJSON[], depth: number) {
-    const positions = []
-    const colors: Color[] = []
-
-    for (let i = 0; i < points.length; i++) {
-      const atom = points[i]
-      const [x, y, z, [r, g, b]] = atom
-      positions.push(new Vector3(x, y, z))
-      colors.push(new Color(r / 255, g / 255, b / 255))
-    }
+  function pointsToOctree() {
+    const keyDesign = new KeyDesign(depth, depth, depth)
 
     const bBox = new Box3()
 
@@ -97,16 +83,12 @@ function CaffeineMolecule() {
 
     bBox.set(new Vector3(minMin, minMin, minMin), new Vector3(maxMax, maxMax, maxMax))
 
-    const keyDesign = new KeyDesign(depth, depth, depth)
-
     const octree = new Octree<Cell>(bBox, keyDesign)
 
     const box = new Box3()
 
     keyDesign.getMinKeyCoordinates(box.min)
     keyDesign.getMaxKeyCoordinates(box.max)
-
-    const level = 0
 
     const keyCoordinates = new Vector3()
 
@@ -141,10 +123,11 @@ function CaffeineMolecule() {
     return octree
   }
 
-  function octreeTo3DTexture(octree: Octree<Cell>, depth: number) {
-    const maxDim = Math.pow(2, depth)
-    const level = 0
+  const octree = pointsToOctree()
+
+  function octreeTo3DTexture() {
     const keyDesign = new KeyDesign(depth, depth, depth)
+
     const box = new Box3()
 
     keyDesign.getMinKeyCoordinates(box.min)
@@ -189,20 +172,50 @@ function CaffeineMolecule() {
     return layers
   }
 
+  const texture3D = octreeTo3DTexture()
+
+  return {
+    texture3D,
+    octree,
+  }
+}
+
+function CaffeineMolecule() {
+  const depth = 3
+
+  const maxDim = Math.pow(2, depth)
+
+  const caffeineData = useLoader(PDBLoader, '/protein.pdb')
+
+  const [molecules, setMolecules] = useState<Octree<Cell>>()
+
+  const ref = createRef()
+
   useEffect(() => {
     const pdb = caffeineData
     const { atoms } = pdb.json as { atoms: AtomJSON[] }
+    let positions: Vector3[] = []
+    let colors: Color[] = []
+    for (let i = 0; i < atoms.length; i++) {
+      const atom = atoms[i]
+      const [x, y, z, [r, g, b]] = atom
+      positions.push(new Vector3(x, y, z))
+      colors.push(new Color(r / 255, g / 255, b / 255))
+    }
 
-    const octree = pointsToField(atoms, depth)
-    const layers = octreeTo3DTexture(octree, depth)
+    const depth = 3
+
+    const {octree, texture3D} = marchCubes({positions, colors}, depth)
 
     const canvas = document.getElementById('debug')! as HTMLCanvasElement
+
+    const maxDim = Math.pow(2, depth)
     canvas.width = maxDim
     canvas.height = maxDim * maxDim
     // canvas.style.width = `${maxDim}px`
     // canvas.style.height = `${maxDim * maxDim}px`
     const ctx = canvas.getContext('2d')
-    layers.forEach((layer, i) => {
+    texture3D.forEach((layer, i) => {
       ctx!.putImageData(layer, 0, i * maxDim)
     })
     // console.log("0,0,0", octree.get(new Vector3(1,1,1), level))
