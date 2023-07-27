@@ -1,7 +1,6 @@
-import { MarchingCube, OrbitControls } from '@react-three/drei'
+import { OrbitControls } from '@react-three/drei'
 import { Object3DNode, extend, useFrame } from '@react-three/fiber'
 import { createRef, Suspense, useEffect, useState, useLayoutEffect } from 'react'
-import { MarchingCubes } from '@react-three/drei'
 import {
   AmbientLight,
   BufferGeometry,
@@ -14,9 +13,8 @@ import {
   OrthographicCamera,
   Vector3,
   InstancedMesh,
+  Matrix4,
   Box3,
-  Group,
-  MeshPhysicalMaterial,
 } from 'three'
 extend({
   AmbientLight,
@@ -28,19 +26,17 @@ extend({
   SphereGeometry,
   InstancedMesh,
   MeshNormalMaterial,
-  MeshPhysicalMaterial,
-  Group,
 })
 import { Octree, KeyDesign } from 'linear-octree'
-// import { OctreeHelper } from 'sparse-octree'
+import { OctreeHelper } from 'sparse-octree'
 
-// extend({ OctreeHelper })
+extend({ OctreeHelper })
 
-// declare module '@react-three/fiber' {
-//   interface ThreeElements {
-//     octreeHelper: Object3DNode<OctreeHelper, typeof OctreeHelper>
-//   }
-// }
+declare module '@react-three/fiber' {
+  interface ThreeElements {
+    octreeHelper: Object3DNode<OctreeHelper, typeof OctreeHelper>
+  }
+}
 
 import { useLoader } from '@react-three/fiber'
 import { PDBLoader } from 'three/examples/jsm/loaders/PDBLoader'
@@ -56,16 +52,11 @@ function Light() {
 type Cell = Color[]
 
 function CaffeineMolecule() {
-  console.log('CaffeineMolecule')
   const caffeineData = useLoader(PDBLoader, '/protein.pdb')
 
-  const [positions, setPositions] = useState<Vector3[]>([])
+  const [molecules, setMolecules] = useState<Octree<Cell>>()
 
   const ref = createRef()
-
-  const depth = 3
-
-  const maxDim = Math.pow(2, depth)
 
   useEffect(() => {
     const pdb = caffeineData
@@ -89,6 +80,10 @@ function CaffeineMolecule() {
     // calculate the minimum and maximum of the bounding box
     let minMin = Math.min(bBox.min.x, bBox.min.y, bBox.min.z)
     let maxMax = Math.max(bBox.max.x, bBox.max.y, bBox.max.z)
+
+    const depth = 3
+
+    const maxDim = Math.pow(2, depth)
 
     // calculate the width of a cell taking in account outer padding of always empty cells
     const cellWidth = (maxMax - minMin) / (maxDim - 2)
@@ -127,7 +122,17 @@ function CaffeineMolecule() {
     const atomR = Math.sqrt(cellWidth * cellWidth) / 2
 
     positions.forEach((position, i) => {
-      addPoint(position, colors[i])
+      const sides = [
+        [atomR, 0, 0],
+        [0, atomR, 0],
+        [0, 0, atomR],
+        [-atomR, 0, 0],
+        [0, -atomR, 0],
+        [0, 0, -atomR],
+      ].map((side) => {
+        return position.clone().add(new Vector3(...side))
+      })
+      sides.forEach((side) => addPoint(side, colors[i]))
     })
 
     let maxDensity = 0
@@ -135,7 +140,7 @@ function CaffeineMolecule() {
       keyDesign.unpackKey(key, keyCoordinates)
       maxDensity = Math.max(maxDensity, octree.get(keyCoordinates, level)!.length)
     }
-
+  
     const layers = []
     for (let x = 0; x < maxDim; x++) {
       const layer = new Uint8ClampedArray(maxDim * maxDim * 4)
@@ -155,7 +160,7 @@ function CaffeineMolecule() {
             )
               .toArray()
               .map((comp) => Math.round(comp * 255))
-            const alpha = Math.round((data.length / maxDensity) * 255)
+            const alpha = Math.round(data.length / maxDensity * 255)
             layer.set([...color, alpha], (y + z * maxDim) * 4)
           }
         }
@@ -175,23 +180,14 @@ function CaffeineMolecule() {
     })
     // console.log("0,0,0", octree.get(new Vector3(1,1,1), level))
 
-    setPositions(positions)
+    setMolecules(octree)
   }, [caffeineData])
 
   useFrame((_, delta) => {
     if (ref.current) ref.current.rotation.y += delta / 3
   })
 
-  // return <octreeHelper args={[molecules]} />
-
-  return (
-    <MarchingCubes resolution={maxDim} enableColors={true} enableUvs={true} maxPolyCount={20000}>
-      {positions.map((position, i) => {
-        return <MarchingCube strength={0.5} subtract={12} color={new Color('#f0f')} position={position} />
-      })}
-      <meshPhysicalMaterial attach="material" color="#f0f" />
-    </MarchingCubes>
-  )
+  return <octreeHelper args={[molecules]} />
 }
 
 function Scene() {
