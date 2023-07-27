@@ -1,4 +1,4 @@
-import { OrbitControls } from '@react-three/drei'
+import { OrbitControls, MarchingCubes, MarchingCube } from '@react-three/drei'
 import { Object3DNode, extend, useFrame } from '@react-three/fiber'
 import { createRef, Suspense, useEffect, useState, useLayoutEffect } from 'react'
 import {
@@ -15,6 +15,8 @@ import {
   InstancedMesh,
   Matrix4,
   Box3,
+  MeshPhysicalMaterial,
+  Group,
 } from 'three'
 extend({
   AmbientLight,
@@ -26,6 +28,8 @@ extend({
   SphereGeometry,
   InstancedMesh,
   MeshNormalMaterial,
+  Group,
+  MeshPhysicalMaterial,
 })
 import { Octree, KeyDesign } from 'linear-octree'
 import { OctreeHelper } from 'sparse-octree'
@@ -51,22 +55,25 @@ function Light() {
 
 type Cell = Color[]
 
+type AtomJSON = [number, number, number, [number, number, number]]
+
 function CaffeineMolecule() {
+  const depth = 3
+
+  const maxDim = Math.pow(2, depth)
+
   const caffeineData = useLoader(PDBLoader, '/protein.pdb')
 
   const [molecules, setMolecules] = useState<Octree<Cell>>()
 
   const ref = createRef()
 
-  useEffect(() => {
-    const pdb = caffeineData
-    const json = pdb.json
-
+  function pointsToField(points: AtomJSON[], depth: number) {
     const positions = []
     const colors: Color[] = []
 
-    for (let i = 0; i < json.atoms.length; i++) {
-      const atom = json.atoms[i]
+    for (let i = 0; i < points.length; i++) {
+      const atom = points[i]
       const [x, y, z, [r, g, b]] = atom
       positions.push(new Vector3(x, y, z))
       colors.push(new Color(r / 255, g / 255, b / 255))
@@ -80,10 +87,6 @@ function CaffeineMolecule() {
     // calculate the minimum and maximum of the bounding box
     let minMin = Math.min(bBox.min.x, bBox.min.y, bBox.min.z)
     let maxMax = Math.max(bBox.max.x, bBox.max.y, bBox.max.z)
-
-    const depth = 3
-
-    const maxDim = Math.pow(2, depth)
 
     // calculate the width of a cell taking in account outer padding of always empty cells
     const cellWidth = (maxMax - minMin) / (maxDim - 2)
@@ -135,13 +138,28 @@ function CaffeineMolecule() {
       sides.forEach((side) => addPoint(side, colors[i]))
     })
 
+    return octree
+  }
+
+  function octreeTo3DTexture(octree: Octree<Cell>, depth: number) {
+    const maxDim = Math.pow(2, depth)
+    const level = 0
+    const keyDesign = new KeyDesign(depth, depth, depth)
+    const box = new Box3()
+
+    keyDesign.getMinKeyCoordinates(box.min)
+    keyDesign.getMaxKeyCoordinates(box.max)
+
+    const keyCoordinates = new Vector3()
+
+    const layers = []
+
     let maxDensity = 0
     for (const key of keyDesign.keyRange(box.min, box.max)) {
       keyDesign.unpackKey(key, keyCoordinates)
       maxDensity = Math.max(maxDensity, octree.get(keyCoordinates, level)!.length)
     }
-  
-    const layers = []
+
     for (let x = 0; x < maxDim; x++) {
       const layer = new Uint8ClampedArray(maxDim * maxDim * 4)
       for (let y = 0; y < maxDim; y++) {
@@ -160,13 +178,23 @@ function CaffeineMolecule() {
             )
               .toArray()
               .map((comp) => Math.round(comp * 255))
-            const alpha = Math.round(data.length / maxDensity * 255)
+            const alpha = Math.round((data.length / maxDensity) * 255)
             layer.set([...color, alpha], (y + z * maxDim) * 4)
           }
         }
       }
-      layers.push(layer)
+      layers.push(new ImageData(layer, maxDim))
     }
+
+    return layers
+  }
+
+  useEffect(() => {
+    const pdb = caffeineData
+    const { atoms } = pdb.json as { atoms: AtomJSON[] }
+
+    const octree = pointsToField(atoms, depth)
+    const layers = octreeTo3DTexture(octree, depth)
 
     const canvas = document.getElementById('debug')! as HTMLCanvasElement
     canvas.width = maxDim
@@ -175,8 +203,7 @@ function CaffeineMolecule() {
     // canvas.style.height = `${maxDim * maxDim}px`
     const ctx = canvas.getContext('2d')
     layers.forEach((layer, i) => {
-      const imageData = new ImageData(layer, maxDim)
-      ctx!.putImageData(imageData, 0, i * maxDim)
+      ctx!.putImageData(layer, 0, i * maxDim)
     })
     // console.log("0,0,0", octree.get(new Vector3(1,1,1), level))
 
