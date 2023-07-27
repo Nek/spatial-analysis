@@ -81,10 +81,12 @@ function CaffeineMolecule() {
     let minMin = Math.min(bBox.min.x, bBox.min.y, bBox.min.z)
     let maxMax = Math.max(bBox.max.x, bBox.max.y, bBox.max.z)
 
-    const depth = 6
+    const depth = 3
+
+    const maxDim = Math.pow(2, depth)
 
     // calculate the width of a cell taking in account outer padding of always empty cells
-    const cellWidth = (maxMax - minMin) / (Math.pow(2, depth) - 2)
+    const cellWidth = (maxMax - minMin) / (maxDim - 2)
 
     // add padding to bounding box
     minMin -= cellWidth
@@ -101,8 +103,6 @@ function CaffeineMolecule() {
     keyDesign.getMinKeyCoordinates(box.min)
     keyDesign.getMaxKeyCoordinates(box.max)
 
-    console.time('Octree creation')
-
     const level = 0
 
     const keyCoordinates = new Vector3()
@@ -118,30 +118,29 @@ function CaffeineMolecule() {
       octree.set(keyCoordinates, level, [...data!, color])
     }
 
-    // calculate the radius of a cell
-    const cellR = Math.sqrt(cellWidth * cellWidth) / 2
+    // calculate the radius of an atom
+    const atomR = Math.sqrt(cellWidth * cellWidth) / 2
 
     positions.forEach((position, i) => {
       const sides = [
-        [cellR, 0, 0],
-        [0, cellR, 0],
-        [0, 0, cellR],
-        [-cellR, 0, 0],
-        [0, -cellR, 0],
-        [0, 0, -cellR],
+        [atomR, 0, 0],
+        [0, atomR, 0],
+        [0, 0, atomR],
+        [-atomR, 0, 0],
+        [0, -atomR, 0],
+        [0, 0, -atomR],
       ].map((side) => {
         return position.clone().add(new Vector3(...side))
       })
       sides.forEach((side) => addPoint(side, colors[i]))
     })
-    console.log(box)
+
     let maxDensity = 0
     for (const key of keyDesign.keyRange(box.min, box.max)) {
       keyDesign.unpackKey(key, keyCoordinates)
       maxDensity = Math.max(maxDensity, octree.get(keyCoordinates, level)!.length)
     }
-    console.log('maxDensity', maxDensity)
-    const maxDim = Math.pow(2, depth)
+  
     const layers = []
     for (let x = 0; x < maxDim; x++) {
       const layer = new Uint8ClampedArray(maxDim * maxDim * 4)
@@ -161,7 +160,7 @@ function CaffeineMolecule() {
             )
               .toArray()
               .map((comp) => Math.round(comp * 255))
-            const alpha = data.length / maxDensity
+            const alpha = Math.round(data.length / maxDensity * 255)
             layer.set([...color, alpha], (y + z * maxDim) * 4)
           }
         }
@@ -172,10 +171,11 @@ function CaffeineMolecule() {
     const canvas = document.getElementById('debug')! as HTMLCanvasElement
     canvas.width = maxDim
     canvas.height = maxDim * maxDim
+    // canvas.style.width = `${maxDim}px`
+    // canvas.style.height = `${maxDim * maxDim}px`
     const ctx = canvas.getContext('2d')
     layers.forEach((layer, i) => {
       const imageData = new ImageData(layer, maxDim)
-      // console.log(imageData)
       ctx!.putImageData(imageData, 0, i * maxDim)
     })
     // console.log("0,0,0", octree.get(new Vector3(1,1,1), level))
