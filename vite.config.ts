@@ -1,16 +1,16 @@
 import { defineConfig } from 'vite'
-import preact from '@preact/preset-vite'
+import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   root: './',
-  resolve: {
-    alias: {
-      react: 'preact/compat',
-      'react-dom': 'preact/compat',
-      'react-reconciler': 'preact-reconciler',
-      'react/jsx-runtime': 'preact/jsx-runtime',
-    },
-  },
+  // resolve: {
+  //   alias: {
+  //     react: 'preact/compat',
+  //     'react-dom': 'preact/compat',
+  //     'react-reconciler': 'preact-reconciler',
+  //     'react/jsx-runtime': 'preact/jsx-runtime',
+  //   },
+  // },
   build: {
     rollupOptions: {
       output: {
@@ -21,7 +21,7 @@ export default defineConfig({
     },
   },
   plugins: [
-    preact({
+    react({
       include: '**/*.jsx',
     }),
   ],

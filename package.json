@@ -5,10 +5,12 @@
   "sideEffects": false,
   "devDependencies": {
     "@preact/preset-vite": "^2.5.0",
-    "@types/three": "^0.154.0",
+    "@types/react": "^18.2.18",
+    "@types/three": "^0.155.0",
+    "@vitejs/plugin-react": "^4.0.4",
     "typescript": "^5.1.6",
-    "vite": "^4.1.4",
-    "vite-bundle-visualizer": "^0.8.0"
+    "vite": "4.4.8",
+    "vite-bundle-visualizer": "^0.10.0"
   },
   "peerDependencies": {
     "preact": ">=10"
@@ -19,14 +21,11 @@
     "analyze": "vite-bundle-visualizer dist --port 5000"
   },
   "dependencies": {
-    "@react-three/drei": "^9.79.0",
-    "@react-three/fiber": "^8.13.5",
+    "@react-three/drei": "^9.80.1",
+    "@react-three/fiber": "^8.13.6",
     "@reecelucas/react-use-hotkeys": "^2.0.0",
-    "linear-octree": "^0.2.0",
-    "preact": "^10.15.0",
-    "preact-reconciler": "^0.1.6",
-    "sparse-octree": "github:nek/sparse-octree",
-    "three": "^0.154.0",
-    "three-stdlib": "^2.24.1"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "three": "^0.155.0"
   }
 }
