@@ -1,38 +1,11 @@
-import { OrbitControls, MarchingCubes, MarchingCube } from '@react-three/drei'
+import { CameraControls, TransformControls, Sphere, Select, OrbitControls, Cone } from '@react-three/drei'
 import { Object3DNode, extend, useFrame } from '@react-three/fiber'
-import { createRef, Suspense, useEffect, useState, useLayoutEffect } from 'react'
-import {
-  AmbientLight,
-  BufferGeometry,
-  Color,
-  DirectionalLight,
-  SphereGeometry,
-  Mesh,
-  MeshNormalMaterial,
-  MeshStandardMaterial,
-  OrthographicCamera,
-  Vector3,
-  InstancedMesh,
-  Matrix4,
-  Box3,
-  MeshPhysicalMaterial,
-  Group,
-} from 'three'
-extend({
-  AmbientLight,
-  DirectionalLight,
-  OrthographicCamera,
-  BufferGeometry,
-  Mesh,
-  MeshStandardMaterial,
-  SphereGeometry,
-  InstancedMesh,
-  MeshNormalMaterial,
-  Group,
-  MeshPhysicalMaterial,
-})
+
 import { OctreeHelper } from 'sparse-octree'
-import {Octree} from 'linear-octree'
+import { RefObject, Suspense, useEffect, useRef, useState } from 'react'
+import useHotkeys from '@reecelucas/react-use-hotkeys'
+import { type Object3D } from 'three'
+
 extend({ OctreeHelper })
 
 declare module '@react-three/fiber' {
@@ -40,10 +13,6 @@ declare module '@react-three/fiber' {
     octreeHelper: Object3DNode<OctreeHelper, typeof OctreeHelper>
   }
 }
-
-import { useLoader } from '@react-three/fiber'
-import { PDBLoader } from 'three/examples/jsm/loaders/PDBLoader'
-import marchCubes from './marchCubes'
 
 function Light() {
   return (
@@ -53,65 +22,48 @@ function Light() {
   )
 }
 
-type AtomJSON = [number, number, number, [number, number, number]]
-
-function CaffeineMolecule() {
-
-  const caffeineData = useLoader(PDBLoader, '/protein.pdb')
-
-  const [molecules, setMolecules] = useState<Octree<Color[]>>()
-
-  const ref = createRef()
-
-  useEffect(() => {
-    const pdb = caffeineData
-    const { atoms } = pdb.json as { atoms: AtomJSON[] }
-    let positions: Vector3[] = []
-    let colors: Color[] = []
-    for (let i = 0; i < atoms.length; i++) {
-      const atom = atoms[i]
-      const [x, y, z, [r, g, b]] = atom
-      positions.push(new Vector3(x, y, z))
-      colors.push(new Color(r / 255, g / 255, b / 255))
-    }
-
-    const depth = 3
-
-    const {octree, texture3D} = marchCubes({positions, colors}, depth)
-
-    const canvas = document.getElementById('debug')! as HTMLCanvasElement
-
-    const maxDim = Math.pow(2, depth)
-    canvas.width = maxDim
-    canvas.height = maxDim * maxDim
-    // canvas.style.width = `${maxDim}px`
-    // canvas.style.height = `${maxDim * maxDim}px`
-    const ctx = canvas.getContext('2d')
-    texture3D.forEach((layer, i) => {
-      ctx!.putImageData(layer, 0, i * maxDim)
-    })
-    // console.log("0,0,0", octree.get(new Vector3(1,1,1), level))
-
-    setMolecules(octree)
-  }, [caffeineData])
-
-  useFrame((_, delta) => {
-    if (ref.current) ref.current.rotation.y += delta / 3
-  })
-
-  return <octreeHelper args={[molecules]} />
+const EditableCone = () => {
+  const mesh = useRef(null)
+  useEffect(() => console.log(mesh.current), [mesh.current])
+  return (
+    <>
+      <mesh ref={mesh}>
+        <coneGeometry args={[1, 3, 32]} />
+        <meshBasicMaterial color={'red'} opacity={0.5} />
+      </mesh>
+      <TransformControls object={mesh.current!} mode="translate" />
+    </>
+  )
 }
 
 function Scene() {
+  const cone = useRef<any>(null!)
+  const mesh = useRef(null)
+  const [selected, setSelected] = useState<Object3D>()
+
+  console.log(selected)
+
   return (
-    <>
-      <OrbitControls makeDefault />
+    <Suspense fallback={<Sphere />}>
+      <gridHelper />
+      <axesHelper args={[5]} />
       <Light />
+      {selected && <TransformControls object={selected} />}
+      <group>
+        <Cone
+          onClick={(e) => {
+            console.log(e)
+            return setSelected(e.object)
+          }}
+        />
+      </group>
+      <mesh onClick={(e) => setSelected(e.object)}>
+        <coneGeometry args={[1, 3, 32]} />
+        <meshBasicMaterial color={'red'} opacity={0.5} />
+      </mesh>
       <ambientLight intensity={0.2} />
-      <Suspense fallback={null}>
-        <CaffeineMolecule />
-      </Suspense>
-    </>
+      {/*<OrbitControls makeDefault />*/}
+    </Suspense>
   )
 }
 

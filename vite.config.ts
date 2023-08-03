@@ -20,5 +20,9 @@ export default defineConfig({
       },
     },
   },
-  plugins: [preact()],
+  plugins: [
+    preact({
+      include: '**/*.jsx',
+    }),
+  ],
 })

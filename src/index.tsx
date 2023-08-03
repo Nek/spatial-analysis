@@ -10,7 +10,19 @@ import {
   ConeGeometry,
   MeshBasicMaterial,
   SRGBColorSpace,
+  BufferGeometry,
+  DirectionalLight,
+  SphereGeometry,
+  MeshNormalMaterial,
+  MeshStandardMaterial,
+  OrthographicCamera,
+  InstancedMesh,
+  MeshPhysicalMaterial,
+  Group,
+  AxesHelper,
+  GridHelper,
 } from 'three'
+
 import { extend, createRoot, events } from '@react-three/fiber'
 import { Scene } from './Scene'
 
@@ -26,6 +38,17 @@ extend({
   CylinderGeometry,
   ConeGeometry,
   MeshBasicMaterial,
+  BufferGeometry,
+  DirectionalLight,
+  SphereGeometry,
+  MeshNormalMaterial,
+  MeshStandardMaterial,
+  OrthographicCamera,
+  InstancedMesh,
+  MeshPhysicalMaterial,
+  Group,
+  AxesHelper,
+  GridHelper,
 })
 
 // Create a react root
@@ -44,7 +67,7 @@ window.addEventListener('resize', () => {
     shadows: 'soft',
     camera: {
       fov: 50,
-      position: [50, 20, 20],
+      position: [0, 6, 12],
     },
     size: { top: 0, left: 0, width: window.innerWidth, height: window.innerHeight },
   })
@@ -53,5 +76,3 @@ window.addEventListener('resize', () => {
 
 // Trigger resize
 window.dispatchEvent(new Event('resize'))
-
-// Render entry point

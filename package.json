@@ -21,10 +21,12 @@
   "dependencies": {
     "@react-three/drei": "^9.79.0",
     "@react-three/fiber": "^8.13.5",
+    "@reecelucas/react-use-hotkeys": "^2.0.0",
     "linear-octree": "^0.2.0",
     "preact": "^10.15.0",
     "preact-reconciler": "^0.1.6",
     "sparse-octree": "github:nek/sparse-octree",
-    "three": "^0.154.0"
+    "three": "^0.154.0",
+    "three-stdlib": "^2.24.1"
   }
 }
