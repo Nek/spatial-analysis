@@ -1,11 +1,13 @@
-import { CameraControls, Cone, Select, Sphere, TransformControls } from '@react-three/drei'
-import { Suspense, useCallback, useEffect, useRef, useState } from 'react'
+import { CameraControls, Cone, Line, Select, Sphere, TransformControls } from '@react-three/drei'
+import { Suspense, useCallback, useRef, useState } from 'react'
 import useHotkeys from '@reecelucas/react-use-hotkeys'
 import { Group, type Object3D } from 'three'
 
 import { randomID, Smush32 } from '@thi.ng/random'
 import { produce } from 'immer'
 import { intersectRayLine } from '@thi.ng/geom-isec'
+
+import { Vec } from '@thi.ng/vector'
 
 // declare module '@react-three/fiber' {
 //   interface ThreeElements {
@@ -37,7 +39,7 @@ type DeviceDatum = { position: [number, number]; rotation: number; FOV: number }
 const CONE_NUM = 5
 const idsRND = new Smush32(0)
 const deviceIds = [...Array(CONE_NUM)].map(() => randomID(8, 'device-', '0123456789ABCDEF', idsRND))
-const deviceFOVs = [45, 60, 75, 30, 90].map((v) => ((v / 2) * Math.PI) / 180)
+const deviceFOVs = [45, 60, 75, 30, 90].map((v) => (v * Math.PI) / 180)
 
 const posRnd = new Smush32(0)
 const defaultDeviceData: [string, DeviceDatum][] = deviceIds.map((id, i) => {
@@ -47,20 +49,41 @@ const defaultDeviceData: [string, DeviceDatum][] = deviceIds.map((id, i) => {
   const rotation = (180 * Math.PI) / 180
   return [id, { position, rotation, FOV }]
 })
+
+type IntersectArgs = [Vec, Vec, Vec, Vec]
+
 function Scene() {
   const [refsByKey, setRef] = useRefs<Group>({})
 
   const [deviceData, setDeviceData] = useState<Record<string, DeviceDatum>>(Object.fromEntries(defaultDeviceData))
 
   const devicesWithNegativeY = Object.entries(deviceData).filter(([_, val]) => val.position[1] < 0)
-  const intersections = devicesWithNegativeY
-    .map<[string, [[number, number], [number, number], [number, number], [number, number]]]>(([key, val]) => [
-      key,
-      [val.position, [Math.sin(val.rotation), -Math.cos(val.rotation)], [-10, 0], [10, 0]],
-    ])
-    // .map(console.log),
-    .map(([_, val]) => intersectRayLine(...val))
-    .map(({ isec }) => isec)
+  const intersections: [string, Vec[]][] = devicesWithNegativeY
+    .map(([key, val]): [string, [IntersectArgs, IntersectArgs, IntersectArgs]] => {
+      const middle: IntersectArgs = [val.position, [Math.sin(val.rotation), -Math.cos(val.rotation)], [-10, 0], [10, 0]]
+      const end: IntersectArgs = [
+        val.position,
+        [Math.sin(val.rotation - val.FOV / 2), -Math.cos(val.rotation - val.FOV / 2)],
+        [-10, 0],
+        [10, 0],
+      ]
+      const start: IntersectArgs = [
+        val.position,
+        [Math.sin(val.rotation + val.FOV / 2), -Math.cos(val.rotation + val.FOV / 2)],
+        [-10, 0],
+        [10, 0],
+      ]
+      return [key, [start, middle, end]]
+    })
+    .map(([key, pointsIntersectArgs]): [string, Vec[]] => {
+      const points = pointsIntersectArgs
+        .map((pointArgs) => {
+          const maybeIntersection = intersectRayLine(...pointArgs)
+          return maybeIntersection.isec
+        })
+        .filter((p) => p !== undefined)
+      return [key, points]
+    })
   console.log(intersections)
   const [selected, setSelected] = useState<Object3D[]>([])
   const active = selected[0]
@@ -148,7 +171,7 @@ function Scene() {
         >
           <group ref={objectsG}>
             {defaultDeviceData.map(([id, { position, rotation, FOV }]) => {
-              const a = FOV
+              const a = FOV / 2
               const r = Math.sqrt(((12 / Math.cos(a)) * 12) / Math.cos(a) - 12 * 12)
               return (
                 <group
@@ -173,13 +196,24 @@ function Scene() {
           </group>
         </Select>
       </group>
-      {Array.isArray(intersections) &&
-        intersections.length > 0 &&
-        (intersections as [number, number][]).map(([x, y]) => (
-          <Sphere args={[0.1, 12, 24]} position={[x, y, 0]}>
-            <meshBasicMaterial color={'red'} />
-          </Sphere>
-        ))}
+      <group>
+        {intersections.flatMap(([key, points]) => {
+          const yIntersections = points.map((p) => {
+            return (
+              <Sphere args={[0.03, 12, 24]} position={[...(p as [number, number]), 0]}>
+                <meshBasicMaterial color={'red'} />
+              </Sphere>
+            )
+          })
+          const linePoints = points.map(([x, y]): [number, number, number] => [x, y, 0])
+          const yLine = linePoints.length > 0 && <Line points={linePoints} color={'red'} lineWidth={2} opacity={0.5} />
+
+          return <group key={key + '-y-intersections'}>{[...yIntersections, yLine]}</group>
+        })}
+      </group>
+      {/*{Array.isArray(intersection) && (*/}
+
+      {/*)}*/}
       <ambientLight intensity={0.2} />
       <CameraControls makeDefault enabled={orbit} />
       <gridHelper />

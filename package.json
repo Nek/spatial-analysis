@@ -24,6 +24,7 @@
     "@thi.ng/arrays": "^2.5.14",
     "@thi.ng/geom-isec": "^2.1.61",
     "@thi.ng/random": "^3.5.0",
+    "@thi.ng/vectors": "^7.7.1",
     "immer": "^10.0.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
