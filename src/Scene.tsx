@@ -1,10 +1,11 @@
 import { CameraControls, Cone, Select, Sphere, TransformControls } from '@react-three/drei'
 import { Suspense, useCallback, useEffect, useRef, useState } from 'react'
 import useHotkeys from '@reecelucas/react-use-hotkeys'
-import { Group, type Object3D, Vector3 } from 'three'
+import { Group, type Object3D } from 'three'
 
 import { randomID, Smush32 } from '@thi.ng/random'
 import { produce } from 'immer'
+import { intersectRayLine } from '@thi.ng/geom-isec'
 
 // declare module '@react-three/fiber' {
 //   interface ThreeElements {
@@ -50,10 +51,17 @@ function Scene() {
   const [refsByKey, setRef] = useRefs<Group>({})
 
   const [deviceData, setDeviceData] = useState<Record<string, DeviceDatum>>(Object.fromEntries(defaultDeviceData))
-  useEffect(() => {
-    console.log('deviceData', deviceData)
-  }, [deviceData])
 
+  const devicesWithNegativeY = Object.entries(deviceData).filter(([_, val]) => val.position[1] < 0)
+  const intersections = devicesWithNegativeY
+    .map<[string, [[number, number], [number, number], [number, number], [number, number]]]>(([key, val]) => [
+      key,
+      [val.position, [Math.sin(val.rotation), -Math.cos(val.rotation)], [-10, 0], [10, 0]],
+    ])
+    // .map(console.log),
+    .map(([_, val]) => intersectRayLine(...val))
+    .map(({ isec }) => isec)
+  console.log(intersections)
   const [selected, setSelected] = useState<Object3D[]>([])
   const active = selected[0]
   useHotkeys('Escape', () => {
@@ -103,6 +111,7 @@ function Scene() {
               draft[key].position = [val?.position.x, val?.position.y]
             }
             if (val?.rotation) {
+              console.log(val?.rotation.z)
               draft[key].rotation = val?.rotation.z
             }
           }
@@ -164,6 +173,13 @@ function Scene() {
           </group>
         </Select>
       </group>
+      {Array.isArray(intersections) &&
+        intersections.length > 0 &&
+        (intersections as [number, number][]).map(([x, y]) => (
+          <Sphere args={[0.1, 12, 24]} position={[x, y, 0]}>
+            <meshBasicMaterial color={'red'} />
+          </Sphere>
+        ))}
       <ambientLight intensity={0.2} />
       <CameraControls makeDefault enabled={orbit} />
       <gridHelper />
