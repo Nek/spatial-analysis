@@ -14,9 +14,9 @@ dependencies:
   '@reecelucas/react-use-hotkeys':
     specifier: ^2.0.0
     version: 2.0.0(react@18.2.0)
-  preact:
-    specifier: '>=10'
-    version: 10.15.0
+  '@thi.ng/random':
+    specifier: ^3.5.0
+    version: 3.5.0
   react:
     specifier: ^18.2.0
     version: 18.2.0
@@ -787,6 +787,38 @@ packages:
       picomatch: 2.3.1
     dev: true
 
+  /@thi.ng/api@8.8.2:
+    resolution: {integrity: sha512-kJCBKhHEYv/gSnbrCGnEgoAX/9bRmVSttQ0GVqQIdJlW3IFlgtz3kz357zcYNQ8mB6cY87e0XxJY3VdbYsgiyQ==}
+    engines: {node: '>=12.7'}
+    dev: false
+
+  /@thi.ng/checks@3.3.14:
+    resolution: {integrity: sha512-VI6x33GD8ahhVH9BJnJKLdjklO8bUtnoa2SWijphQ7U0Sizai3r4z7bn8cY6YLx6qm+kZgTchzn/Td/SL69qzA==}
+    engines: {node: '>=12.7'}
+    dependencies:
+      tslib: 2.6.1
+    dev: false
+
+  /@thi.ng/errors@2.2.17:
+    resolution: {integrity: sha512-gL1KOHVQpSX9e5BDbKzxJcXj+tM2T6dJOxXTJz3nHNSXT6VdEsXCVeLKGUFBkLkA5QsH/nzmgQq7a5vS7cdGTA==}
+    engines: {node: '>=12.7'}
+    dev: false
+
+  /@thi.ng/hex@2.3.11:
+    resolution: {integrity: sha512-GFsrAIMybSlBRTFxlhMQQUe7LNk7Ry2ZKBJAlxtke0FoIAPLK7at2U4FvuQDG59wsa5sVrzsYMziJe3is8Do1Q==}
+    engines: {node: '>=12.7'}
+    dev: false
+
+  /@thi.ng/random@3.5.0:
+    resolution: {integrity: sha512-7vXhxz/9/iv2DuZrA7Xye77t+PjDM7Vx3RIJ66+pvZ0A3Tso3TEZ/B7f2jC4Wtuxpw7PLlINsXXsLYtYPeqrNA==}
+    engines: {node: '>=12.7'}
+    dependencies:
+      '@thi.ng/api': 8.8.2
+      '@thi.ng/checks': 3.3.14
+      '@thi.ng/errors': 2.2.17
+      '@thi.ng/hex': 2.3.11
+    dev: false
+
   /@tweenjs/tween.js@18.6.4:
     resolution: {integrity: sha512-lB9lMjuqjtuJrx7/kOkqQBtllspPIN+96OvTCeJ2j5FEzinoAXTdAMFnDAQT1KVPRlnYfBrqxtqP66vDM40xxQ==}
 
@@ -1292,6 +1324,7 @@ packages:
 
   /preact@10.15.0:
     resolution: {integrity: sha512-nZSa8M2R2m1n7nJSBlzDpxRJaIsejrTO1vlFbdpFvyC8qM1iU+On2y0otfoUm6SRB5o0lF0CKDFxg6grEFU0iQ==}
+    dev: true
 
   /prop-types@15.8.1:
     resolution: {integrity: sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==}
@@ -1550,6 +1583,10 @@ packages:
 
   /troika-worker-utils@0.47.2:
     resolution: {integrity: sha512-mzss4MeyzUkYBppn4x5cdAqrhBHFEuVmMMgLMTyFV23x6GvQMyo+/R5E5Lsbrt7WSt5RfvewjcwD1DChRTA9lA==}
+    dev: false
+
+  /tslib@2.6.1:
+    resolution: {integrity: sha512-t0hLfiEKfMUoqhG+U1oid7Pva4bbDPHYfJNiB7BiIjRkj1pyC++4N3huJfqY6aRH6VTB0rvtzQwjM4K6qpfOig==}
     dev: false
 
   /typescript@5.1.6:
