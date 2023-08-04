@@ -1,9 +1,10 @@
-import { CameraControls, TransformControls, Sphere, Select, Cone } from '@react-three/drei'
-import { Suspense, useRef, useState } from 'react'
+import { CameraControls, Cone, Select, Sphere, TransformControls } from '@react-three/drei'
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react'
 import useHotkeys from '@reecelucas/react-use-hotkeys'
-import { Group, type Object3D } from 'three'
+import { Group, type Object3D, Vector3 } from 'three'
 
 import { randomID, Smush32 } from '@thi.ng/random'
+import { produce } from 'immer'
 
 // declare module '@react-three/fiber' {
 //   interface ThreeElements {
@@ -11,14 +12,16 @@ import { randomID, Smush32 } from '@thi.ng/random'
 //   }
 // }
 
-function useRefs<T>(): [Record<string, T | null>, (element: T | null, key: string) => void] {
-  const refsByKey = useRef<Record<string, T | null>>({})
+function useRefs<T>(
+  initialValue: Record<string, T | null>,
+): [Record<string, T | null>, (element: T | null, key: string) => void] {
+  const refsByKey = useRef<Record<string, T | null>>(initialValue)
 
   const setRef = (element: T | null, key: string) => {
     refsByKey.current[key] = element
   }
 
-  return [refsByKey.current, setRef]
+  return [{ ...refsByKey.current }, setRef]
 }
 
 function Light() {
@@ -28,11 +31,28 @@ function Light() {
     </directionalLight>
   )
 }
+type DeviceDatum = { position: [number, number]; rotation: number; FOV: number }
 
+const CONE_NUM = 5
 const idsRND = new Smush32(0)
-const CONE_IDS = [...Array(5)].map(() => randomID(8, 'cone-', '0123456789ABCDEF', idsRND))
+const deviceIds = [...Array(CONE_NUM)].map(() => randomID(8, 'device-', '0123456789ABCDEF', idsRND))
+const deviceFOVs = [45, 60, 75, 30, 90].map((v) => ((v / 2) * Math.PI) / 180)
+
+const posRnd = new Smush32(0)
+const defaultDeviceData: [string, DeviceDatum][] = deviceIds.map((id, i) => {
+  const FOV = deviceFOVs[i]
+  // const r = Math.sqrt(((12 / Math.cos(FOV)) * 12) / Math.cos(FOV) - 12 * 12)
+  const position = [posRnd.minmax(-3, 3), posRnd.minmax(1, 1.5)] as [number, number]
+  const rotation = (180 * Math.PI) / 180
+  return [id, { position, rotation, FOV }]
+})
 function Scene() {
-  const [refsByKey, setRef] = useRefs()
+  const [refsByKey, setRef] = useRefs<Group>({})
+
+  const [deviceData, setDeviceData] = useState<Record<string, DeviceDatum>>(Object.fromEntries(defaultDeviceData))
+  useEffect(() => {
+    console.log('deviceData', deviceData)
+  }, [deviceData])
 
   const [selected, setSelected] = useState<Object3D[]>([])
   const active = selected[0]
@@ -44,9 +64,15 @@ function Scene() {
   useHotkeys('t', () => {
     setTransformMode('translate')
   })
-  useHotkeys('s', () => {
-    setTransformMode('scale')
-  })
+  useHotkeys(
+    's',
+    () => {
+      setTransformMode('scale')
+    },
+    {
+      enabled: false,
+    },
+  )
   useHotkeys('r', () => {
     setTransformMode('rotate')
   })
@@ -63,14 +89,31 @@ function Scene() {
   })
 
   const objectsG = useRef<Group | null>(null)
-  const posRnd = new Smush32(0)
+
+  const handleTransform = useCallback(
+    (id: number) => {
+      console.log(id)
+
+      setDeviceData(
+        produce((draft) => {
+          const keyVal = Object.entries(refsByKey).find(([_, val]) => val?.id === id)
+          if (keyVal) {
+            const [key, val] = keyVal
+            if (val?.position) {
+              draft[key].position = [val?.position.x, val?.position.y]
+            }
+            if (val?.rotation) {
+              draft[key].rotation = val?.rotation.z
+            }
+          }
+        }),
+      )
+    },
+    [refsByKey],
+  )
 
   return (
     <Suspense fallback={<Sphere />}>
-      <CameraControls makeDefault enabled={orbit} />
-      <gridHelper />
-      <axesHelper args={[5]} />
-      <Light />
       {active && (
         <TransformControls
           showZ={transformMode === 'rotate'}
@@ -79,46 +122,53 @@ function Scene() {
           mode={transformMode}
           object={active}
           space={space}
-          onObjectChange={(e) => console.log(e?.target.object)}
+          onObjectChange={(e) => handleTransform(e?.target?.object?.id)}
         />
       )}
-      <Select
-        filter={(selected) => {
-          console.log('!!!')
-          const res = selected.filter((s) => s.name === 'cone')
-          console.log(res)
-          return res
-        }}
-        // onChange={(e) => setSelected(e)}
-        onClick={(e) => {
-          let res = e.object
-          while (e.object.parent && res.name !== 'cone') {
-            res = e.object.parent
-            console.log(res)
-          }
-          console.log(res)
-          setSelected([res])
-        }}
-      >
-        <group ref={objectsG}>
-          {CONE_IDS.map((id) => {
-            return (
-              <group
-                name="cone"
-                key={id}
-                ref={(el) => setRef(el, id)}
-                rotation={[0, 0, (180 * Math.PI) / 180, 'XYZ']}
-                position={[posRnd.minmax(-3, 3), posRnd.minmax(1, 1.5), 0]}
-              >
-                <Cone args={[1, 12, 24]} position={[0, -6, 0]}>
-                  <meshBasicMaterial color={'rgb(164,84,217)'} opacity={0.25} transparent={true} depthWrite={false} />
-                </Cone>
-              </group>
-            )
-          })}
-        </group>
-      </Select>
+      <group>
+        <Select
+          filter={(selected) => selected.filter((s) => s.name === 'cone')}
+          // onChange={(e) => setSelected(e)}
+          onClick={(e) => {
+            let res = e.object
+            while (e.object.parent && res.name !== 'cone') {
+              res = e.object.parent
+            }
+            setSelected([res])
+          }}
+        >
+          <group ref={objectsG}>
+            {defaultDeviceData.map(([id, { position, rotation, FOV }]) => {
+              const a = FOV
+              const r = Math.sqrt(((12 / Math.cos(a)) * 12) / Math.cos(a) - 12 * 12)
+              return (
+                <group
+                  name="cone"
+                  key={id}
+                  ref={(el) => setRef(el, id)}
+                  rotation={[0, 0, rotation, 'XYZ']}
+                  position={[...position, 0]}
+                >
+                  <Cone args={[r, 12, 24]} position={[0, -6, 0]}>
+                    <meshBasicMaterial
+                      color={'rgb(164,84,217)'}
+                      opacity={0.25}
+                      transparent={true}
+                      depthWrite={false}
+                      depthTest={false}
+                    />
+                  </Cone>
+                </group>
+              )
+            })}
+          </group>
+        </Select>
+      </group>
       <ambientLight intensity={0.2} />
+      <CameraControls makeDefault enabled={orbit} />
+      <gridHelper />
+      <axesHelper args={[5]} />
+      <Light />
     </Suspense>
   )
 }

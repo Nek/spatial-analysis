@@ -21,7 +21,10 @@
     "@react-three/drei": "^9.80.1",
     "@react-three/fiber": "^8.13.6",
     "@reecelucas/react-use-hotkeys": "^2.0.0",
+    "@thi.ng/arrays": "^2.5.14",
+    "@thi.ng/geom-isec": "^2.1.61",
     "@thi.ng/random": "^3.5.0",
+    "immer": "^10.0.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "three": "^0.155.0"
