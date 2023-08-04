@@ -3,14 +3,23 @@ import { Suspense, useRef, useState } from 'react'
 import useHotkeys from '@reecelucas/react-use-hotkeys'
 import { Group, type Object3D } from 'three'
 
-import { Smush32 } from '@thi.ng/random'
-const rnd = new Smush32(0)
+import { randomID, Smush32 } from '@thi.ng/random'
 
 // declare module '@react-three/fiber' {
 //   interface ThreeElements {
 //     octreeHelper: Object3DNode<OctreeHelper, typeof OctreeHelper>
 //   }
 // }
+
+function useRefs<T>(): [Record<string, T | null>, (element: T | null, key: string) => void] {
+  const refsByKey = useRef<Record<string, T | null>>({})
+
+  const setRef = (element: T | null, key: string) => {
+    refsByKey.current[key] = element
+  }
+
+  return [refsByKey.current, setRef]
+}
 
 function Light() {
   return (
@@ -20,7 +29,11 @@ function Light() {
   )
 }
 
+const idsRND = new Smush32(0)
+const CONE_IDS = [...Array(5)].map(() => randomID(8, 'cone-', '0123456789ABCDEF', idsRND))
 function Scene() {
+  const [refsByKey, setRef] = useRefs()
+
   const [selected, setSelected] = useState<Object3D[]>([])
   const active = selected[0]
   useHotkeys('Escape', () => {
@@ -50,6 +63,7 @@ function Scene() {
   })
 
   const objectsG = useRef<Group | null>(null)
+  const posRnd = new Smush32(0)
 
   return (
     <Suspense fallback={<Sphere />}>
@@ -68,14 +82,33 @@ function Scene() {
           onObjectChange={(e) => console.log(e?.target.object)}
         />
       )}
-      <Select box multiple={true} onChange={(e) => setSelected(e)} onClick={(e) => setSelected([e.object])}>
+      <Select
+        filter={(selected) => {
+          console.log('!!!')
+          const res = selected.filter((s) => s.name === 'cone')
+          console.log(res)
+          return res
+        }}
+        // onChange={(e) => setSelected(e)}
+        onClick={(e) => {
+          let res = e.object
+          while (e.object.parent && res.name !== 'cone') {
+            res = e.object.parent
+            console.log(res)
+          }
+          console.log(res)
+          setSelected([res])
+        }}
+      >
         <group ref={objectsG}>
-          {[...Array(5)].map((_, i) => {
+          {CONE_IDS.map((id) => {
             return (
               <group
-                key={'cone' + i}
+                name="cone"
+                key={id}
+                ref={(el) => setRef(el, id)}
                 rotation={[0, 0, (180 * Math.PI) / 180, 'XYZ']}
-                position={[rnd.minmax(-3, 3), rnd.minmax(1, 1.5), 0]}
+                position={[posRnd.minmax(-3, 3), posRnd.minmax(1, 1.5), 0]}
               >
                 <Cone args={[1, 12, 24]} position={[0, -6, 0]}>
                   <meshBasicMaterial color={'rgb(164,84,217)'} opacity={0.25} transparent={true} depthWrite={false} />
