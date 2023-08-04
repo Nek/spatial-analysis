@@ -1,13 +1,13 @@
 import { CameraControls, Cone, Line, Select, Sphere, TransformControls } from '@react-three/drei'
 import { Suspense, useCallback, useRef, useState } from 'react'
 import useHotkeys from '@reecelucas/react-use-hotkeys'
-import { Group, type Object3D } from 'three'
+import { type Group, type Object3D } from 'three'
 
 import { randomID, Smush32 } from '@thi.ng/random'
 import { produce } from 'immer'
 import { intersectRayLine } from '@thi.ng/geom-isec'
 
-import { Vec } from '@thi.ng/vector'
+import { type Vec } from '@thi.ng/vectors'
 
 // declare module '@react-three/fiber' {
 //   interface ThreeElements {
@@ -81,7 +81,7 @@ function Scene() {
           const maybeIntersection = intersectRayLine(...pointArgs)
           return maybeIntersection.isec
         })
-        .filter((p) => p !== undefined)
+        .filter((p): p is Vec => p !== undefined)
       return [key, points]
     })
   console.log(intersections)
