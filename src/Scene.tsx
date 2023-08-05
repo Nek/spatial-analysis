@@ -1,7 +1,7 @@
 import { CameraControls, Cone, Line, Select, Sphere, TransformControls } from '@react-three/drei'
 import { Suspense, useCallback, useRef, useState } from 'react'
 import useHotkeys from '@reecelucas/react-use-hotkeys'
-import { type Group, type Object3D } from 'three'
+import { Group, Object3D } from 'three'
 
 import { randomID, Smush32 } from '@thi.ng/random'
 import { produce } from 'immer'
@@ -119,8 +119,6 @@ function Scene() {
     event.preventDefault()
   })
 
-  const objectsG = useRef<Group | null>(null)
-
   const handleTransform = useCallback(
     (id: number) => {
       console.log(id)
@@ -169,7 +167,7 @@ function Scene() {
             setSelected([res])
           }}
         >
-          <group ref={objectsG}>
+          <group>
             {defaultDeviceData.map(([id, { position, rotation, FOV }]) => {
               const a = FOV / 2
               const r = Math.sqrt(((12 / Math.cos(a)) * 12) / Math.cos(a) - 12 * 12)
