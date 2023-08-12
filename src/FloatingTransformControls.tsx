@@ -11,7 +11,7 @@ type FloatingTransformControlsProps = {
   selectedObserverId: ObserverId | null
   mode: Editor['transformMode']
   space: Editor['coordinateSystem']
-  onTransform: (observerId: ObserverId, object: Object3D) => void
+  onTransform: (object: Object3D) => void
 }
 function FloatingTransformControls({
   position,
@@ -31,7 +31,7 @@ function FloatingTransformControls({
       mode={mode}
       object={ref.current}
       space={space}
-      onObjectChange={(e) => onTransform(selectedObserverId, e?.target?.object)}
+      onObjectChange={(e) => onTransform(e?.target?.object)}
     />
   )
   return (

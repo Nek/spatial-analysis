@@ -5,7 +5,7 @@ import { Color, Object3D } from 'three'
 import { produce, enableMapSet } from 'immer'
 enableMapSet()
 
-import { ObserverId, Domain, Editor, initialDomainState, initialEditorState } from './state.ts'
+import { Domain, Editor, initialDomainState, initialEditorState } from './state.ts'
 import { ObserverView } from './ObserverView.tsx'
 import { useHotkeys } from './useHotkeys.ts'
 import { Intersection } from './Intersection.tsx'
@@ -21,9 +21,10 @@ function Scene() {
 
   useHotkeys(setEditor)
 
-  const handleTransform = (observerID: ObserverId, object: Object3D) =>
+  const handleTransform = (object: Object3D) =>
     setDomain(
       produce((draft) => {
+        const observerID = editor.selectedObserverId
         if (observerID) {
           const { position, rotation } = objectToObserver(object)
           draft.observers[observerID].position = position
@@ -33,7 +34,7 @@ function Scene() {
     )
 
   const { position, rotation } = observerToObject(
-    (editor.selectedObserverId && domain.observers[editor.selectedObserverId]) || { position: [0, 0], rotation: 0 },
+    editor.selectedObserverId && domain.observers[editor.selectedObserverId],
   )
 
   return (

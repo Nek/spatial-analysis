@@ -12,13 +12,16 @@ export const objectToObserver: (object: Pick<Object3D, 'position' | 'rotation'>)
   rotation: object.rotation.z,
 })
 
-export const observerToObject: (observer: Pick<Observer, 'position' | 'rotation'>) => {
+export const observerToObject: (observer: Pick<Observer, 'position' | 'rotation'> | null) => {
   position: Point3D
   rotation: Euler
-} = (observer) => ({
-  position: [...(observer?.position || [0, 0]), 0],
-  rotation: [0, 0, observer?.rotation || 0, 'XYZ'],
-})
+} = (observer) => {
+  const { position, rotation } = observer || { position: [0, 0], rotation: 0 }
+  return {
+    position: [...(position || [0, 0]), 0],
+    rotation: [0, 0, rotation || 0, 'XYZ'],
+  }
+}
 
 type IntersectArgs = [Point2D, Point2D, Point2D, Point2D]
 type IntersectStartMiddleEndArgs = TupleOf<IntersectArgs, 3>
