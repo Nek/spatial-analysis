@@ -1,6 +1,5 @@
 import { CameraControls, Line, Sphere, TransformControls } from '@react-three/drei'
-import { Suspense, useCallback, useState } from 'react'
-import useHotkeys from '@reecelucas/react-use-hotkeys'
+import { Suspense, useState } from 'react'
 import { Color, Object3D } from 'three'
 
 import { randomID, Smush32 } from '@thi.ng/random'
@@ -10,9 +9,10 @@ enableMapSet()
 import { intersectRayLine } from '@thi.ng/geom-isec'
 
 import { type Vec } from '@thi.ng/vectors'
-import { Observer, ObserverID, Point2D, Point3D, State } from './domain.ts'
+import { Caches, Observer, ObserverID, Point2D, Point3D, Domain, Editor } from './states.ts'
 import { ObserverView } from './ObserverView.tsx'
 import { TupleOf } from './types.ts'
+import { useHotkeys } from './useHotkeys.ts'
 
 const CONE_NUM = 5
 const idsRND = new Smush32(0)
@@ -35,7 +35,7 @@ const observers: Record<ObserverID, Observer> = Object.fromEntries(
   }),
 )
 
-function Intersection ({ observerID, points }: { observerID: ObserverID; points: Point2D[] }) {
+function Intersection({ observerID, points }: { observerID: ObserverID; points: Point2D[] }) {
   const intersectionMarkers = points.map((p: Point2D, ndx: number) => {
     return (
       <Sphere key={`${observerID}-intersection-marker-${ndx}`} args={[0.03, 12, 24]} position={[...p, 0]}>
@@ -52,16 +52,23 @@ function Intersection ({ observerID, points }: { observerID: ObserverID; points:
 }
 
 function Scene() {
-  const [state, setState] = useState<State>({
+  const [domain, setDomain] = useState<Domain>({
     observers,
-    objectToObserverID: new Map<Object3D, ObserverID>(),
-    observerIdToObject: {},
+  })
+
+  const [caches, setCaches] = useState<Caches>({ observerIdToObject: {}, objectToObserverID: new Map() })
+
+  const [editor, setEditor] = useState<Editor>({
+    cameraControl: 'orbit',
+    coordinateSystem: 'world',
+    selected: null,
+    transformMode: 'translate',
   })
 
   type IntersectStartMiddleEndArgs = TupleOf<IntersectArgs, 3>
 
   type AxisIntersection = [ObserverID, Point2D[]]
-  const axisXIntersections: AxisIntersection[] = Object.entries(state.observers)
+  const axisXIntersections: AxisIntersection[] = Object.entries(domain.observers)
     .map(([observerID, observer]): [ObserverID, IntersectStartMiddleEndArgs] => {
       const middle: IntersectArgs = [
         observer.position,
@@ -92,72 +99,39 @@ function Scene() {
         .filter((p): p is Vec => p !== undefined)
       return [key, points as Point2D[]]
     })
-  const [selected, setSelected] = useState<Object3D | null>()
-  useHotkeys('Escape', () => {
-    setSelected(null)
-  })
 
-  const [transformMode, setTransformMode] = useState<'scale' | 'translate' | 'rotate'>('translate')
-  useHotkeys('t', () => {
-    setTransformMode('translate')
-  })
-  useHotkeys(
-    's',
-    () => {
-      setTransformMode('scale')
-    },
-    {
-      enabled: false,
-    },
-  )
-  useHotkeys('r', () => {
-    setTransformMode('rotate')
-  })
+  useHotkeys(setEditor)
 
-  const [space, setSpace] = useState<'world' | 'local'>('world')
-  useHotkeys('c', () => {
-    setSpace(space === 'world' ? 'local' : 'world')
-  })
-
-  const [orbit, setOrbit] = useState(true)
-  useHotkeys(' ', (event) => {
-    setOrbit(!orbit)
-    event.preventDefault()
-  })
-  const handleTransform = useCallback(
-    (obj: Object3D) => {
-      setState(
-        produce((draft) => {
-          const observerID = state.objectToObserverID.get(obj)
-          if (observerID) {
-            draft.observers[observerID].position = [obj.position.x, obj.position.y]
-            draft.observers[observerID].rotation = obj.rotation.z
-          }
-        }),
-      )
-    },
-    [state.objectToObserverID],
-  )
+  const handleTransform = (obj: Object3D) =>
+    setDomain(
+      produce((draft) => {
+        const observerID = caches.objectToObserverID.get(obj)
+        if (observerID) {
+          draft.observers[observerID].position = [obj.position.x, obj.position.y]
+          draft.observers[observerID].rotation = obj.rotation.z
+        }
+      }),
+    )
 
   return (
     <Suspense fallback={<Sphere />}>
-      {selected && (
+      {editor.selected && (
         <TransformControls
           key={'transform-controls'}
-          showZ={transformMode === 'rotate'}
-          showX={transformMode !== 'rotate'}
-          showY={transformMode !== 'rotate'}
-          mode={transformMode}
-          object={selected}
-          space={space}
+          showZ={editor.transformMode === 'rotate'}
+          showX={editor.transformMode !== 'rotate'}
+          showY={editor.transformMode !== 'rotate'}
+          mode={editor.transformMode}
+          object={editor.selected}
+          space={editor.coordinateSystem}
           onObjectChange={(e) => handleTransform(e?.target?.object)}
         />
       )}
-      {Object.values(state.observers).map(({ id, position, rotation, FOV }) => {
+      {Object.values(domain.observers).map(({ id, position, rotation, FOV }) => {
         const a = FOV / 2
         const r = Math.sqrt(((12 / Math.cos(a)) * 12) / Math.cos(a) - 12 * 12)
         const color =
-          state.observerIdToObject[id] === selected ? new Color('rgb(255,0,0)') : new Color('rgb(164,84,217)')
+          caches.observerIdToObject[id] === editor.selected ? new Color('rgb(255,0,0)') : new Color('rgb(164,84,217)')
         return (
           <ObserverView
             key={id}
@@ -166,15 +140,21 @@ function Scene() {
             position={position}
             r={r}
             color={color}
-            onUpdate={(object) => {
-              setState(
+            onUpdate={(object) =>
+              setCaches(
                 produce((draft) => {
                   draft.objectToObserverID.set(object, id)
                   draft.observerIdToObject[id] = object
                 }),
               )
-            }}
-            onClick={(object: Object3D) => setSelected(object)}
+            }
+            onClick={(object: Object3D) =>
+              setEditor(
+                produce((draft) => {
+                  draft.selected = object
+                }),
+              )
+            }
           />
         )
       })}
@@ -182,7 +162,7 @@ function Scene() {
         <Intersection observerID={key} points={points} />
       ))}
       <ambientLight intensity={0.2} />
-      <CameraControls key={'camera-controls'} makeDefault enabled={orbit} />
+      <CameraControls key={'camera-controls'} makeDefault enabled={editor.cameraControl === 'orbit'} />
       <gridHelper />
       <axesHelper args={[5]} />
       <directionalLight position={[5, 5, -8]} castShadow intensity={1.5} shadow-mapSize={2048} shadow-bias={-0.001}>
