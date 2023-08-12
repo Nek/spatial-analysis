@@ -1,5 +1,5 @@
 import { CameraControls, Cone, Line, Select, Sphere, TransformControls } from '@react-three/drei'
-import { Suspense, useCallback, useRef, useState } from 'react'
+import { createRef, ForwardedRef, forwardRef, Suspense, useCallback, useRef, useState } from 'react'
 import useHotkeys from '@reecelucas/react-use-hotkeys'
 import { Group, Object3D } from 'three'
 
@@ -8,12 +8,6 @@ import { produce } from 'immer'
 import { intersectRayLine } from '@thi.ng/geom-isec'
 
 import { type Vec } from '@thi.ng/vectors'
-
-// declare module '@react-three/fiber' {
-//   interface ThreeElements {
-//     octreeHelper: Object3DNode<OctreeHelper, typeof OctreeHelper>
-//   }
-// }
 
 function useRefs<T>(
   initialValue: Record<string, T | null>,
@@ -51,6 +45,25 @@ const defaultDeviceData: [string, DeviceDatum][] = deviceIds.map((id, i) => {
 })
 
 type IntersectArgs = [Vec, Vec, Vec, Vec]
+
+const Observer = forwardRef(function Observer(props: { rotation: number, position: [number, number], r: number }, ref: ForwardedRef<Group>) {
+  return <group
+    name='cone'
+    ref={ref}
+    rotation={[0, 0, props.rotation, 'XYZ']}
+    position={[...props.position, 0]}
+  >
+    <Cone args={[props.r, 12, 24]} position={[0, -6, 0]}>
+      <meshBasicMaterial
+        color={'rgb(164,84,217)'}
+        opacity={0.25}
+        transparent={true}
+        depthWrite={false}
+        depthTest={false}
+      />
+    </Cone>
+  </group>
+})
 
 function Scene() {
   const [refsByKey, setRef] = useRefs<Group>({})
@@ -109,7 +122,7 @@ function Scene() {
   })
 
   const [space, setSpace] = useState<'world' | 'local'>('world')
-  useHotkeys('q', () => {
+  useHotkeys('c', () => {
     setSpace(space === 'world' ? 'local' : 'world')
   })
 
@@ -121,8 +134,6 @@ function Scene() {
 
   const handleTransform = useCallback(
     (id: number) => {
-      console.log(id)
-
       setDeviceData(
         produce((draft) => {
           const keyVal = Object.entries(refsByKey).find(([_, val]) => val?.id === id)
@@ -171,24 +182,10 @@ function Scene() {
             {defaultDeviceData.map(([id, { position, rotation, FOV }]) => {
               const a = FOV / 2
               const r = Math.sqrt(((12 / Math.cos(a)) * 12) / Math.cos(a) - 12 * 12)
+              const ref = createRef<Group>()
+              setRef(ref.current, id)
               return (
-                <group
-                  name="cone"
-                  key={id}
-                  ref={(el) => setRef(el, id)}
-                  rotation={[0, 0, rotation, 'XYZ']}
-                  position={[...position, 0]}
-                >
-                  <Cone args={[r, 12, 24]} position={[0, -6, 0]}>
-                    <meshBasicMaterial
-                      color={'rgb(164,84,217)'}
-                      opacity={0.25}
-                      transparent={true}
-                      depthWrite={false}
-                      depthTest={false}
-                    />
-                  </Cone>
-                </group>
+                <Observer key={id} ref={ref} rotation={rotation} position={position} r={r} />
               )
             })}
           </group>
