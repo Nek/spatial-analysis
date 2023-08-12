@@ -11,7 +11,6 @@ function useAppHotkeys(setEditor: Dispatch<SetStateAction<Editor>>) {
       }),
     ),
   )
-
   useHotkeys('t', () =>
     setEditor(
       produce((draft) => {

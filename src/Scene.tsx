@@ -1,5 +1,5 @@
-import { CameraControls, Line, Sphere, TransformControls } from '@react-three/drei'
-import { Suspense, useState } from 'react'
+import { CameraControls, Sphere, TransformControls } from '@react-three/drei'
+import { Suspense, useEffect, useState } from 'react'
 import { Color, Object3D } from 'three'
 
 import { randomID, Smush32 } from '@thi.ng/random'
@@ -9,10 +9,11 @@ enableMapSet()
 import { intersectRayLine } from '@thi.ng/geom-isec'
 
 import { type Vec } from '@thi.ng/vectors'
-import { Caches, Observer, ObserverID, Point2D, Point3D, Domain, Editor } from './states.ts'
+import { Caches, Observer, ObserverID, Point2D, Domain, Editor } from './states.ts'
 import { ObserverView } from './ObserverView.tsx'
 import { TupleOf } from './types.ts'
 import { useHotkeys } from './useHotkeys.ts'
+import { Intersection } from './Intersection.tsx'
 
 const CONE_NUM = 5
 const idsRND = new Smush32(0)
@@ -35,35 +36,22 @@ const observers: Record<ObserverID, Observer> = Object.fromEntries(
   }),
 )
 
-function Intersection({ observerID, points }: { observerID: ObserverID; points: Point2D[] }) {
-  const intersectionMarkers = points.map((p: Point2D, ndx: number) => {
-    return (
-      <Sphere key={`${observerID}-intersection-marker-${ndx}`} args={[0.03, 12, 24]} position={[...p, 0]}>
-        <meshBasicMaterial color={'red'} />
-      </Sphere>
-    )
-  })
-  const linePoints = points.map(([x, y]): Point3D => [x, y, 0])
-  const intersectionLine = linePoints.length > 0 && (
-    <Line key={`${observerID}-intersection-line`} points={linePoints} color={'red'} lineWidth={2} opacity={0.5} />
-  )
-
-  return <group key={`${observerID}-intersection`}>{[...intersectionMarkers, intersectionLine]}</group>
-}
+const initialDomainState: () => Domain = () => ({ observers })
+const initialCachesState: () => Caches = () => ({ observerIdToObject: {}, objectToObserverID: new Map() })
+const initialEditorState: () => Editor = () => ({
+  cameraControl: 'orbit',
+  coordinateSystem: 'world',
+  selected: null,
+  transformMode: 'translate',
+  pendingTransform: null,
+})
 
 function Scene() {
-  const [domain, setDomain] = useState<Domain>({
-    observers,
-  })
+  const [domain, setDomain] = useState<Domain>(initialDomainState)
 
-  const [caches, setCaches] = useState<Caches>({ observerIdToObject: {}, objectToObserverID: new Map() })
+  const [caches, setCaches] = useState<Caches>(initialCachesState)
 
-  const [editor, setEditor] = useState<Editor>({
-    cameraControl: 'orbit',
-    coordinateSystem: 'world',
-    selected: null,
-    transformMode: 'translate',
-  })
+  const [editor, setEditor] = useState<Editor>(initialEditorState)
 
   type IntersectStartMiddleEndArgs = TupleOf<IntersectArgs, 3>
 
@@ -103,15 +91,33 @@ function Scene() {
   useHotkeys(setEditor)
 
   const handleTransform = (obj: Object3D) =>
-    setDomain(
+    setEditor(
       produce((draft) => {
-        const observerID = caches.objectToObserverID.get(obj)
-        if (observerID) {
-          draft.observers[observerID].position = [obj.position.x, obj.position.y]
-          draft.observers[observerID].rotation = obj.rotation.z
-        }
+        draft.pendingTransform = obj
       }),
     )
+
+  useEffect(() => {
+    if (editor.pendingTransform) {
+      setDomain(
+        produce((draft) => {
+          const object = editor.pendingTransform
+          if (object) {
+            const observerID = editor.pendingTransform && caches.objectToObserverID.get(editor.pendingTransform)
+            if (observerID) {
+              draft.observers[observerID].position = [object.position.x, object.position.y]
+              draft.observers[observerID].rotation = object.rotation.z
+            }
+          }
+        }),
+      )
+      setEditor(
+        produce((draft) => {
+          draft.pendingTransform = null
+        }),
+      )
+    }
+  }, [editor.pendingTransform])
 
   return (
     <Suspense fallback={<Sphere />}>

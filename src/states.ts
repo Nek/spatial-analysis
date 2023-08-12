@@ -21,4 +21,5 @@ export type Editor = {
   transformMode: "scale" | "translate" | "rotate",
   coordinateSystem: "world" | "local",
   cameraControl: "orbit" | null,
+  pendingTransform: Object3D | null,
 }
