@@ -1,15 +1,20 @@
 import { CameraControls, Cone, Line, Select, Sphere, TransformControls } from '@react-three/drei'
 import { createRef, ForwardedRef, forwardRef, Suspense, useCallback, useRef, useState } from 'react'
 import useHotkeys from '@reecelucas/react-use-hotkeys'
-import { Group, Object3D } from 'three'
+import { Color, Group, Object3D } from 'three'
 
 import { randomID, Smush32 } from '@thi.ng/random'
 import { produce } from 'immer'
 import { intersectRayLine } from '@thi.ng/geom-isec'
 
+type TupleOf<T, N extends number> = N extends N ? number extends N ? T[] : _TupleOf<T, N, []> : never;
+type _TupleOf<T, N extends number, R extends unknown[]> = R['length'] extends N ? R : _TupleOf<T, N, [T, ...R]>;
+
+type Point2D = TupleOf<number, 2>
+
 import { type Vec } from '@thi.ng/vectors'
 
-function useRefs<T>(
+function useMap<T>(
   initialValue: Record<string, T | null>,
 ): [Record<string, T | null>, (element: T | null, key: string) => void] {
   const refsByKey = useRef<Record<string, T | null>>(initialValue)
@@ -28,7 +33,7 @@ function Light() {
     </directionalLight>
   )
 }
-type DeviceDatum = { position: [number, number]; rotation: number; FOV: number }
+type DeviceDatum = { position: Point2D; rotation: number; FOV: number }
 
 const CONE_NUM = 5
 const idsRND = new Smush32(0)
@@ -39,15 +44,16 @@ const posRnd = new Smush32(0)
 const defaultDeviceData: [string, DeviceDatum][] = deviceIds.map((id, i) => {
   const FOV = deviceFOVs[i]
   // const r = Math.sqrt(((12 / Math.cos(FOV)) * 12) / Math.cos(FOV) - 12 * 12)
-  const position = [posRnd.minmax(-3, 3), posRnd.minmax(1, 1.5)] as [number, number]
+  const position = [posRnd.minmax(-3, 3), posRnd.minmax(1, 1.5)] as Point2D
   const rotation = (180 * Math.PI) / 180
   return [id, { position, rotation, FOV }]
 })
 
 type IntersectArgs = [Vec, Vec, Vec, Vec]
 
-const Observer = forwardRef(function Observer(props: { rotation: number, position: [number, number], r: number }, ref: ForwardedRef<Group>) {
+const ObserverView = forwardRef((props: {id: string, color: Color, rotation: number, position: TupleOf<number, 2>, r: number }, ref: ForwardedRef<Group>) => {
   return <group
+    key={props.id}
     name='cone'
     ref={ref}
     rotation={[0, 0, props.rotation, 'XYZ']}
@@ -55,7 +61,7 @@ const Observer = forwardRef(function Observer(props: { rotation: number, positio
   >
     <Cone args={[props.r, 12, 24]} position={[0, -6, 0]}>
       <meshBasicMaterial
-        color={'rgb(164,84,217)'}
+        color={props.color}
         opacity={0.25}
         transparent={true}
         depthWrite={false}
@@ -66,7 +72,7 @@ const Observer = forwardRef(function Observer(props: { rotation: number, positio
 })
 
 function Scene() {
-  const [refsByKey, setRef] = useRefs<Group>({})
+  const [valsByKey, setValByKey] = useMap<Group>({})
 
   const [deviceData, setDeviceData] = useState<Record<string, DeviceDatum>>(Object.fromEntries(defaultDeviceData))
 
@@ -136,7 +142,7 @@ function Scene() {
     (id: number) => {
       setDeviceData(
         produce((draft) => {
-          const keyVal = Object.entries(refsByKey).find(([_, val]) => val?.id === id)
+          const keyVal = Object.entries(valsByKey).find(([_, val]) => val?.id === id)
           if (keyVal) {
             const [key, val] = keyVal
             if (val?.position) {
@@ -150,7 +156,7 @@ function Scene() {
         }),
       )
     },
-    [refsByKey],
+    [valsByKey],
   )
 
   return (
@@ -183,9 +189,11 @@ function Scene() {
               const a = FOV / 2
               const r = Math.sqrt(((12 / Math.cos(a)) * 12) / Math.cos(a) - 12 * 12)
               const ref = createRef<Group>()
-              setRef(ref.current, id)
+              setValByKey(ref.current, id)
+              const color = ref.current === active ? new Color('rgb(255,0,0)') : new Color('rgb(164,84,217)')
+              console.log(active, ref.current)
               return (
-                <Observer key={id} ref={ref} rotation={rotation} position={position} r={r} />
+                <ObserverView key={id} id={id} ref={ref} rotation={rotation} position={position} r={r} color={color}/>
               )
             })}
           </group>
