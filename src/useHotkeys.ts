@@ -1,13 +1,13 @@
 import { Dispatch, SetStateAction } from 'react'
 import useHotkeys from '@reecelucas/react-use-hotkeys'
-import { Editor } from './states.ts'
+import { Editor } from './state.ts'
 import { produce } from 'immer'
 
 function useAppHotkeys(setEditor: Dispatch<SetStateAction<Editor>>) {
   useHotkeys('Escape', () =>
     setEditor(
       produce((draft) => {
-        draft.selected = null
+        draft.selectedObserverId = null
       }),
     ),
   )
