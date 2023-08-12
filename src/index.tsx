@@ -26,7 +26,7 @@ import {
 } from 'three'
 
 import { extend, createRoot, events } from '@react-three/fiber'
-import { SceneView } from './SceneView.tsx'
+import { Scene } from './Scene.tsx'
 
 // Register the THREE namespace as native JSX elements.
 // See below for notes on tree-shaking
@@ -75,7 +75,7 @@ window.addEventListener('resize', () => {
     },
     size: { top: 0, left: 0, width: window.innerWidth, height: window.innerHeight },
   })
-  root.render(<SceneView />)
+  root.render(<Scene />)
 })
 
 // Trigger resize
