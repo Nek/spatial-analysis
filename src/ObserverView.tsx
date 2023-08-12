@@ -8,7 +8,6 @@ const ObserverView = (props: {
   rotation: number
   position: TupleOf<number, 2>
   r: number
-  onUpdate: (self: Object3D) => void
   onClick: (obj: Object3D) => void
 }) => {
   return (
@@ -17,7 +16,6 @@ const ObserverView = (props: {
       name="cone"
       rotation={[0, 0, props.rotation, 'XYZ']}
       position={[...props.position, 0]}
-      onUpdate={(self) => props.onUpdate(self)}
       onClick={(e) => props.onClick(e.eventObject)}
     >
       <Cone args={[props.r, 12, 24]} position={[0, -6, 0]}>

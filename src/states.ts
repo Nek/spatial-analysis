@@ -11,13 +11,8 @@ export type Domain = {
   observers: Record<ObserverID, Observer>
 }
 
-export type Caches = {
-  observerIdToObject: Record<ObserverID, Object3D>
-  objectToObserverID: Map<Object3D, ObserverID>
-}
-
 export type Editor = {
-  selected: Object3D | null,
+  selectedObserverId: ObserverID | null,
   transformMode: "scale" | "translate" | "rotate",
   coordinateSystem: "world" | "local",
   cameraControl: "orbit" | null,

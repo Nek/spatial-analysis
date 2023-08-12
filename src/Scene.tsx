@@ -1,5 +1,5 @@
 import { CameraControls, Sphere, TransformControls } from '@react-three/drei'
-import { Suspense, useEffect, useState } from 'react'
+import { Suspense, useRef, useState } from 'react'
 import { Color, Object3D } from 'three'
 
 import { randomID, Smush32 } from '@thi.ng/random'
@@ -9,7 +9,7 @@ enableMapSet()
 import { intersectRayLine } from '@thi.ng/geom-isec'
 
 import { type Vec } from '@thi.ng/vectors'
-import { Caches, Observer, ObserverID, Point2D, Domain, Editor } from './states.ts'
+import { Observer, ObserverID, Point2D, Domain, Editor } from './states.ts'
 import { ObserverView } from './ObserverView.tsx'
 import { TupleOf } from './types.ts'
 import { useHotkeys } from './useHotkeys.ts'
@@ -37,19 +37,16 @@ const observers: Record<ObserverID, Observer> = Object.fromEntries(
 )
 
 const initialDomainState: () => Domain = () => ({ observers })
-const initialCachesState: () => Caches = () => ({ observerIdToObject: {}, objectToObserverID: new Map() })
 const initialEditorState: () => Editor = () => ({
   cameraControl: 'orbit',
   coordinateSystem: 'world',
-  selected: null,
+  selectedObserverId: null,
   transformMode: 'translate',
   pendingTransform: null,
 })
 
 function Scene() {
   const [domain, setDomain] = useState<Domain>(initialDomainState)
-
-  const [caches, setCaches] = useState<Caches>(initialCachesState)
 
   const [editor, setEditor] = useState<Editor>(initialEditorState)
 
@@ -90,54 +87,47 @@ function Scene() {
 
   useHotkeys(setEditor)
 
-  const handleTransform = (obj: Object3D) =>
-    setEditor(
+  const handleTransform = (observerID: ObserverID, object: Object3D) =>
+    setDomain(
       produce((draft) => {
-        draft.pendingTransform = obj
+        if (observerID) {
+          draft.observers[observerID].position = [object.position.x, object.position.y]
+          draft.observers[observerID].rotation = object.rotation.z
+        }
       }),
     )
 
-  useEffect(() => {
-    if (editor.pendingTransform) {
-      setDomain(
-        produce((draft) => {
-          const object = editor.pendingTransform
-          if (object) {
-            const observerID = editor.pendingTransform && caches.objectToObserverID.get(editor.pendingTransform)
-            if (observerID) {
-              draft.observers[observerID].position = [object.position.x, object.position.y]
-              draft.observers[observerID].rotation = object.rotation.z
-            }
-          }
-        }),
-      )
-      setEditor(
-        produce((draft) => {
-          draft.pendingTransform = null
-        }),
-      )
-    }
-  }, [editor.pendingTransform])
-
+  const ref = useRef(null)
   return (
     <Suspense fallback={<Sphere />}>
-      {editor.selected && (
-        <TransformControls
-          key={'transform-controls'}
-          showZ={editor.transformMode === 'rotate'}
-          showX={editor.transformMode !== 'rotate'}
-          showY={editor.transformMode !== 'rotate'}
-          mode={editor.transformMode}
-          object={editor.selected}
-          space={editor.coordinateSystem}
-          onObjectChange={(e) => handleTransform(e?.target?.object)}
-        />
+      <group
+        ref={ref}
+        position={[...(domain.observers[editor.selectedObserverId || 'observer-00000000']?.position || [0, 0]), 0]}
+        rotation={[0, 0, domain.observers[editor.selectedObserverId || 'observer-00000000']?.rotation || 0, 'XYZ']}
+      ></group>
+      )
+      {editor.selectedObserverId && (
+        <>
+          {ref.current && (
+            <TransformControls
+              key={'transform-controls'}
+              showZ={editor.transformMode === 'rotate'}
+              showX={editor.transformMode !== 'rotate'}
+              showY={editor.transformMode !== 'rotate'}
+              mode={editor.transformMode}
+              object={ref.current}
+              space={editor.coordinateSystem}
+              onObjectChange={(e) =>
+                editor.selectedObserverId && handleTransform(editor.selectedObserverId, e?.target?.object)
+              }
+            />
+          )}
+        </>
       )}
       {Object.values(domain.observers).map(({ id, position, rotation, FOV }) => {
         const a = FOV / 2
         const r = Math.sqrt(((12 / Math.cos(a)) * 12) / Math.cos(a) - 12 * 12)
-        const color =
-          caches.observerIdToObject[id] === editor.selected ? new Color('rgb(255,0,0)') : new Color('rgb(164,84,217)')
+        const color = id === editor.selectedObserverId ? new Color('rgb(255,0,0)') : new Color('rgb(164,84,217)')
         return (
           <ObserverView
             key={id}
@@ -146,18 +136,10 @@ function Scene() {
             position={position}
             r={r}
             color={color}
-            onUpdate={(object) =>
-              setCaches(
-                produce((draft) => {
-                  draft.objectToObserverID.set(object, id)
-                  draft.observerIdToObject[id] = object
-                }),
-              )
-            }
-            onClick={(object: Object3D) =>
+            onClick={() =>
               setEditor(
                 produce((draft) => {
-                  draft.selected = object
+                  draft.selectedObserverId = id
                 }),
               )
             }
