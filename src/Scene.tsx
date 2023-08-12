@@ -35,7 +35,7 @@ const observers: Record<ObserverID, Observer> = Object.fromEntries(
   }),
 )
 
-const Intersection = ({ observerID, points }: { observerID: ObserverID; points: Point2D[] }) => {
+function Intersection ({ observerID, points }: { observerID: ObserverID; points: Point2D[] }) {
   const intersectionMarkers = points.map((p: Point2D, ndx: number) => {
     return (
       <Sphere key={`${observerID}-intersection-marker-${ndx}`} args={[0.03, 12, 24]} position={[...p, 0]}>
@@ -48,7 +48,7 @@ const Intersection = ({ observerID, points }: { observerID: ObserverID; points: 
     <Line key={`${observerID}-intersection-line`} points={linePoints} color={'red'} lineWidth={2} opacity={0.5} />
   )
 
-  return <>{[...intersectionMarkers, intersectionLine]}</>
+  return <group key={`${observerID}-intersection`}>{[...intersectionMarkers, intersectionLine]}</group>
 }
 
 function Scene() {
@@ -143,6 +143,7 @@ function Scene() {
     <Suspense fallback={<Sphere />}>
       {selected && (
         <TransformControls
+          key={'transform-controls'}
           showZ={transformMode === 'rotate'}
           showX={transformMode !== 'rotate'}
           showY={transformMode !== 'rotate'}
@@ -152,40 +153,36 @@ function Scene() {
           onObjectChange={(e) => handleTransform(e?.target?.object)}
         />
       )}
-        <>
-          {Object.values(state.observers).map(({ id, position, rotation, FOV }) => {
-            const a = FOV / 2
-            const r = Math.sqrt(((12 / Math.cos(a)) * 12) / Math.cos(a) - 12 * 12)
-            const color =
-              state.observerIdToObject[id] === selected ? new Color('rgb(255,0,0)') : new Color('rgb(164,84,217)')
-            return (
-              <ObserverView
-                key={id}
-                id={id}
-                rotation={rotation}
-                position={position}
-                r={r}
-                color={color}
-                onUpdate={(object) => {
-                  setState(
-                    produce((draft) => {
-                      draft.objectToObserverID.set(object, id)
-                      draft.observerIdToObject[id] = object
-                    }),
-                  )
-                }}
-                onClick={(object: Object3D) => setSelected(object)}
-              />
-            )
-          })}
-      </>
-      <>
-        {axisXIntersections.flatMap(([key, points]) => (
-          <Intersection observerID={key} points={points} />
-        ))}
-      </>
+      {Object.values(state.observers).map(({ id, position, rotation, FOV }) => {
+        const a = FOV / 2
+        const r = Math.sqrt(((12 / Math.cos(a)) * 12) / Math.cos(a) - 12 * 12)
+        const color =
+          state.observerIdToObject[id] === selected ? new Color('rgb(255,0,0)') : new Color('rgb(164,84,217)')
+        return (
+          <ObserverView
+            key={id}
+            id={id}
+            rotation={rotation}
+            position={position}
+            r={r}
+            color={color}
+            onUpdate={(object) => {
+              setState(
+                produce((draft) => {
+                  draft.objectToObserverID.set(object, id)
+                  draft.observerIdToObject[id] = object
+                }),
+              )
+            }}
+            onClick={(object: Object3D) => setSelected(object)}
+          />
+        )
+      })}
+      {axisXIntersections.flatMap(([key, points]) => (
+        <Intersection observerID={key} points={points} />
+      ))}
       <ambientLight intensity={0.2} />
-      <CameraControls makeDefault enabled={orbit} />
+      <CameraControls key={'camera-controls'} makeDefault enabled={orbit} />
       <gridHelper />
       <axesHelper args={[5]} />
       <directionalLight position={[5, 5, -8]} castShadow intensity={1.5} shadow-mapSize={2048} shadow-bias={-0.001}>
