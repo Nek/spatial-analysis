@@ -57,10 +57,21 @@ extend({
 
 // Create a react root
 const root = createRoot(document.getElementById('root') as HTMLCanvasElement)
-
+declare global {
+  interface Window {
+    __THREE_DEVTOOLS__: EventTarget;
+  }
+}
 // createRoot by design is not responsive, you have to take care of resize yourself
 window.addEventListener('resize', () => {
   root.configure({
+    onCreated(state) {
+      const __THREE_DEVTOOLS__ = window.__THREE_DEVTOOLS__
+      if (typeof __THREE_DEVTOOLS__ !== 'undefined') {
+        __THREE_DEVTOOLS__.dispatchEvent(new CustomEvent('observe', { detail: state.scene }))
+        __THREE_DEVTOOLS__.dispatchEvent(new CustomEvent('observe', { detail: state.gl }))
+      }
+    },
     events,
     dpr: [1, 2],
     gl: {
