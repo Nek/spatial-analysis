@@ -1,9 +1,9 @@
-import { TupleOf } from './types.ts'
+import { TupleOf } from '$/types'
 import { Euler } from '@react-three/fiber'
-import { Editor, ObserverId } from './state.ts'
 import { Object3D } from 'three'
 import { useRef } from 'react'
 import { TransformControls } from '@react-three/drei'
+import { ObserverId, Editor } from '$/types'
 
 type FloatingTransformControlsProps = {
   position: TupleOf<number, 3>

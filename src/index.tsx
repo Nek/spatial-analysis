@@ -23,10 +23,12 @@ import {
   SRGBColorSpace,
   SphereGeometry,
   SpotLight,
+  LineDashedMaterial,
+  LineBasicMaterial,
 } from 'three'
 
 import { extend, createRoot, events } from '@react-three/fiber'
-import { Scene } from './Scene.tsx'
+import { Scene } from '$/Scene'
 
 // Register the THREE namespace as native JSX elements.
 // See below for notes on tree-shaking
@@ -53,6 +55,8 @@ extend({
   PointLight,
   SphereGeometry,
   SpotLight,
+  LineDashedMaterial,
+  LineBasicMaterial,
 })
 
 // Create a react root

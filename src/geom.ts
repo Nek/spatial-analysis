@@ -1,6 +1,5 @@
 import { Object3D } from 'three'
-import { Domain, Observer, ObserverId, Point2D, Point3D } from './state.ts'
-import { TupleOf } from './types.ts'
+import { Domain, Observer, ObserverId, Point2D, Point3D, DeepReadonly, TupleOf } from '$/types'
 import { intersectRayLine } from '@thi.ng/geom-isec'
 import { Euler } from '@react-three/fiber'
 
@@ -12,13 +11,13 @@ export const objectToObserver: (object: Pick<Object3D, 'position' | 'rotation'>)
   rotation: object.rotation.z,
 })
 
-export const observerToObject: (observer: Pick<Observer, 'position' | 'rotation'> | null) => {
+export const observerToObject: (observer: DeepReadonly<Pick<Observer, 'position' | 'rotation'>> | null) => {
   position: Point3D
   rotation: Euler
 } = (observer) => {
   const { position, rotation } = observer || { position: [0, 0], rotation: 0 }
   return {
-    position: [...(position || [0, 0]), 0],
+    position: [...(position || [0, 0]), 0] as Point3D,
     rotation: [0, 0, rotation || 0, 'XYZ'],
   }
 }
@@ -26,23 +25,23 @@ export const observerToObject: (observer: Pick<Observer, 'position' | 'rotation'
 type IntersectArgs = [Point2D, Point2D, Point2D, Point2D]
 type IntersectStartMiddleEndArgs = TupleOf<IntersectArgs, 3>
 type AxisIntersection = [ObserverId, Point2D[]]
-export const intersectWithXAxis: (observers: Domain['observers']) => AxisIntersection[] = (observers) => {
+export const intersectWithXAxis: (observers: DeepReadonly<Domain['observers']>) => AxisIntersection[] = (observers) => {
   return Object.entries(observers)
     .map(([observerId, observer]): [ObserverId, IntersectStartMiddleEndArgs] => {
       const middle: IntersectArgs = [
-        observer.position,
+        observer.position as Point2D,
         [Math.sin(observer.rotation), -Math.cos(observer.rotation)],
         [-10, 0],
         [10, 0],
       ]
       const end: IntersectArgs = [
-        observer.position,
+        observer.position as Point2D,
         [Math.sin(observer.rotation - observer.FOV / 2), -Math.cos(observer.rotation - observer.FOV / 2)],
         [-10, 0],
         [10, 0],
       ]
       const start: IntersectArgs = [
-        observer.position,
+        observer.position as Point2D,
         [Math.sin(observer.rotation + observer.FOV / 2), -Math.cos(observer.rotation + observer.FOV / 2)],
         [-10, 0],
         [10, 0],

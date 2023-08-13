@@ -1,6 +1,7 @@
-import { Color, Object3D } from 'three'
-import { TupleOf } from './types.ts'
+import { Color, MeshBasicMaterial, Object3D } from 'three'
+import { TupleOf } from '$/types'
 import { Cone } from '@react-three/drei'
+import { CachedMaterial } from '$/components/CachedMaterial'
 
 const ObserverView = (props: {
   id: string
@@ -19,7 +20,16 @@ const ObserverView = (props: {
       onClick={(e) => props.onClick(e.eventObject)}
     >
       <Cone args={[props.r, 12, 24]} position={[0, -6, 0]}>
-        <meshBasicMaterial color={props.color} opacity={0.25} transparent={true} depthWrite={false} depthTest={false} />
+        <CachedMaterial
+          constructor={MeshBasicMaterial}
+          parameters={{
+            color: props.color,
+            opacity: 0.25,
+            transparent: true,
+            depthWrite: false,
+            depthTest: false,
+          }}
+        />
       </Cone>
     </group>
   )

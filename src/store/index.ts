@@ -1,22 +1,6 @@
-import { TupleOf } from './types.ts'
 import { randomID, Smush32 } from '@thi.ng/random'
-
-export type Point2D = TupleOf<number, 2>
-export type Point3D = TupleOf<number, 3>
-export type ObserverId = `observer-${string}`
-
-export type Observer = { position: Point2D; rotation: number; FOV: number; id: ObserverId }
-
-export type Domain = {
-  observers: Record<ObserverId, Observer>
-}
-
-export type Editor = {
-  selectedObserverId: ObserverId | null
-  transformMode: 'scale' | 'translate' | 'rotate'
-  coordinateSystem: 'world' | 'local'
-  cameraControl: 'orbit' | null
-}
+import { proxy } from 'valtio'
+import { Editor, Domain, ObserverId, Point2D } from '$/types'
 
 const CONE_NUM = 5
 const idsRND = new Smush32(0)
@@ -27,7 +11,7 @@ const deviceFOVs = [45, 60, 75, 30, 90].map((v) => (v * Math.PI) / 180)
 
 const posRnd = new Smush32(0)
 
-export const initialDomainState: () => Domain = () => ({
+const initialDomainState: () => Domain = () => ({
   observers: Object.fromEntries(
     deviceIds.map((id, i) => {
       const FOV = deviceFOVs[i]
@@ -38,10 +22,14 @@ export const initialDomainState: () => Domain = () => ({
     }),
   ),
 })
-export const initialEditorState: () => Editor = () => ({
+const initialEditorState: () => Editor = () => ({
   cameraControl: 'orbit',
   coordinateSystem: 'world',
   selectedObserverId: null,
   transformMode: 'translate',
-  pendingTransform: null,
+})
+
+export const store = proxy<{ domain: Domain; editor: Editor; }>({
+  domain: initialDomainState(),
+  editor: initialEditorState(),
 })
