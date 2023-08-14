@@ -15,8 +15,8 @@ dependencies:
     specifier: ^2.0.0
     version: 2.0.0(react@18.2.0)
   '@thi.ng/arrays':
-    specifier: ^2.5.15
-    version: 2.5.15
+    specifier: ^2.5.19
+    version: 2.5.19
   '@thi.ng/geom-isec':
     specifier: ^2.1.62
     version: 2.1.62
@@ -810,16 +810,21 @@ packages:
     engines: {node: '>=12.7'}
     dev: false
 
-  /@thi.ng/arrays@2.5.15:
-    resolution: {integrity: sha512-sMCB2nAGSugzrpWkt70N0zf6htvf9qssmiRq2eP9lHDSsUd2v7aeg3Ps++77yUJ6Mw4os9POi/55jvO4v9/Mpg==}
+  /@thi.ng/api@8.9.3:
+    resolution: {integrity: sha512-qeqv/PEisDuYyeWZSAx+7tNYXWGq0f67M/w2Msu5a7pY+0l5Zix+NhhJPoWS4HA+SADx1/CHAW16PHVhOtujOQ==}
+    engines: {node: '>=12.7'}
+    dev: false
+
+  /@thi.ng/arrays@2.5.19:
+    resolution: {integrity: sha512-grQHFxD9ryizTHsyps7Sa8BcczN7eum0kPOytzMOiy2fbD2HgQ7YwtHibdOX6QqNshutM5iWq3y0gLXpx5v8Bg==}
     engines: {node: '>=12.7'}
     dependencies:
-      '@thi.ng/api': 8.9.0
-      '@thi.ng/checks': 3.4.0
-      '@thi.ng/compare': 2.1.33
-      '@thi.ng/equiv': 2.1.25
-      '@thi.ng/errors': 2.3.0
-      '@thi.ng/random': 3.5.1
+      '@thi.ng/api': 8.9.3
+      '@thi.ng/checks': 3.4.3
+      '@thi.ng/compare': 2.1.36
+      '@thi.ng/equiv': 2.1.28
+      '@thi.ng/errors': 2.3.3
+      '@thi.ng/random': 3.6.1
     dev: false
 
   /@thi.ng/binary@3.3.28:
@@ -836,11 +841,25 @@ packages:
       tslib: 2.6.1
     dev: false
 
+  /@thi.ng/checks@3.4.3:
+    resolution: {integrity: sha512-JRnJ/SUOVYUZM5/HalDviAaDn1alTuvPCQBPsGRQ7mjreyAbgNjVGKBW592ZnaGAN6uclF0SzA5KwqiJeTMd0Q==}
+    engines: {node: '>=12.7'}
+    dependencies:
+      tslib: 2.6.1
+    dev: false
+
   /@thi.ng/compare@2.1.33:
     resolution: {integrity: sha512-cscjOP0g7FUS0046F6KhbdPNVOTDQRB5hIa6t7a2bK6MpNpbEdw1x6hWpIcUt8KmSO+k4j/qgygPC/M32J3eYw==}
     engines: {node: '>=12.7'}
     dependencies:
       '@thi.ng/api': 8.9.0
+    dev: false
+
+  /@thi.ng/compare@2.1.36:
+    resolution: {integrity: sha512-kLo6QcTjjvpeikNnRXjvFsunLn6PfEQxk0iSBIoXUhjON0FSD+hl4m2arULMebNEP/Ihd9qEwLqFjlb4vPxi3w==}
+    engines: {node: '>=12.7'}
+    dependencies:
+      '@thi.ng/api': 8.9.3
     dev: false
 
   /@thi.ng/compose@2.1.35:
@@ -856,8 +875,18 @@ packages:
     engines: {node: '>=12.7'}
     dev: false
 
+  /@thi.ng/equiv@2.1.28:
+    resolution: {integrity: sha512-aOITQk2wZ9fatNNJskpZj7v2GwLxlTo2OX/9yBlGMmyCFQE+Vyb+1Cx3N4voXMxkqPIu5Z60z3vtWuTdLU13qg==}
+    engines: {node: '>=12.7'}
+    dev: false
+
   /@thi.ng/errors@2.3.0:
     resolution: {integrity: sha512-gbOskPQfuZ9logBFFg2yjT8kiKK+YYOVZhChanwIOGvIXwGE+H/IdJt5irXkafzauRiqc4tI6mtkzeA4kDfYKg==}
+    engines: {node: '>=12.7'}
+    dev: false
+
+  /@thi.ng/errors@2.3.3:
+    resolution: {integrity: sha512-sZ6aKV7p8J1o8EHTWBzH2/fx6Q4p6oJuyjYwXly7vidsSSWulFE9Rj5bqfMwMUfL6yNWKlEIRLMMDUvBPehAiA==}
     engines: {node: '>=12.7'}
     dev: false
 
@@ -894,6 +923,11 @@ packages:
     engines: {node: '>=12.7'}
     dev: false
 
+  /@thi.ng/hex@2.3.15:
+    resolution: {integrity: sha512-MRcxdOOCuom6g82WQww3/6qtorcIA4YYnPb6BltEYwj9bUC2+dAwAAxXXetW4yv4/BiJ2xl0Y++eMs6qxm+nDA==}
+    engines: {node: '>=12.7'}
+    dev: false
+
   /@thi.ng/math@5.5.1:
     resolution: {integrity: sha512-JIPVppWH2ONx2okZYQcgiAIZ9R08q0sUXgJuiy5a1+sAyekvxDVPk5JMZ1qlfqjRBlXJFPKNjUVIPbu9OomaTw==}
     engines: {node: '>=12.7'}
@@ -918,6 +952,16 @@ packages:
       '@thi.ng/hex': 2.3.12
     dev: false
 
+  /@thi.ng/random@3.6.1:
+    resolution: {integrity: sha512-ys67q8NOiWGHEr9kpFhvOTW6/wLgmZx6lMJYh7htY+jv64PnPqSzfA1pPPoBHu3Y56DwhADKZy5zdk6mkHBYEw==}
+    engines: {node: '>=12.7'}
+    dependencies:
+      '@thi.ng/api': 8.9.3
+      '@thi.ng/checks': 3.4.3
+      '@thi.ng/errors': 2.3.3
+      '@thi.ng/hex': 2.3.15
+    dev: false
+
   /@thi.ng/strings@3.4.8:
     resolution: {integrity: sha512-sAPTcUovXmunhFDRKh/aTlb8reLCgVCDGLYHSMYAP0ogstwQ8Yq0fC0WPcOmzVMyQTen0N8yXbOXDpjWqrxfOg==}
     engines: {node: '>=12.7'}
@@ -933,7 +977,7 @@ packages:
     engines: {node: '>=12.7'}
     dependencies:
       '@thi.ng/api': 8.9.0
-      '@thi.ng/arrays': 2.5.15
+      '@thi.ng/arrays': 2.5.19
       '@thi.ng/checks': 3.4.0
       '@thi.ng/compare': 2.1.33
       '@thi.ng/compose': 2.1.35
