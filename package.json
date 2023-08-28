@@ -5,7 +5,7 @@
   "sideEffects": false,
   "devDependencies": {
     "@preact/preset-vite": "^2.5.0",
-    "@types/node": "^20.4.10",
+    "@types/node": "^20.5.7",
     "@types/react": "^18.2.18",
     "@types/three": "^0.155.0",
     "@vitejs/plugin-react": "^4.0.4",
