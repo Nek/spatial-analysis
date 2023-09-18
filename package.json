@@ -23,7 +23,7 @@
     "@react-three/fiber": "^8.13.6",
     "@reecelucas/react-use-hotkeys": "^2.0.0",
     "@thi.ng/arrays": "^2.5.15",
-    "@thi.ng/geom-isec": "^2.1.62",
+    "@thi.ng/geom-isec": "^2.1.74",
     "@thi.ng/random": "^3.5.1",
     "@thi.ng/vectors": "^7.7.2",
     "immer": "^10.0.2",
