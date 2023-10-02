@@ -19,7 +19,7 @@
     "analyze": "vite-bundle-visualizer dist --port 5000"
   },
   "dependencies": {
-    "@react-three/drei": "^9.80.1",
+    "@react-three/drei": "^9.86.3",
     "@react-three/fiber": "^8.13.6",
     "@reecelucas/react-use-hotkeys": "^2.0.0",
     "@thi.ng/arrays": "^2.5.15",
