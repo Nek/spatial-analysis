@@ -47,8 +47,8 @@ devDependencies:
     specifier: ^2.5.0
     version: 2.5.0(@babel/core@7.22.9)(preact@10.16.0)(vite@4.4.8)
   '@types/node':
-    specifier: ^20.4.10
-    version: 20.4.10
+    specifier: ^20.8.6
+    version: 20.8.6
   '@types/react':
     specifier: ^18.2.18
     version: 18.2.18
@@ -63,7 +63,7 @@ devDependencies:
     version: 5.1.6
   vite:
     specifier: 4.4.8
-    version: 4.4.8(@types/node@20.4.10)
+    version: 4.4.8(@types/node@20.8.6)
   vite-bundle-visualizer:
     specifier: ^0.10.0
     version: 0.10.0
@@ -618,7 +618,7 @@ packages:
       debug: 4.3.4
       kolorist: 1.8.0
       resolve: 1.22.2
-      vite: 4.4.8(@types/node@20.4.10)
+      vite: 4.4.8(@types/node@20.8.6)
     transitivePeerDependencies:
       - preact
       - supports-color
@@ -652,7 +652,7 @@ packages:
       '@prefresh/utils': 1.2.0
       '@rollup/pluginutils': 4.2.1
       preact: 10.16.0
-      vite: 4.4.8(@types/node@20.4.10)
+      vite: 4.4.8(@types/node@20.8.6)
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -965,8 +965,10 @@ packages:
     resolution: {integrity: sha512-goh23EGr6CLV6aKPwN1p8kBD/7tT5V/bLpToSbarKrwVejqNrspVrv8DhliteYkkhZYrlq/fwKZRRUzH4XN88w==}
     dev: false
 
-  /@types/node@20.4.10:
-    resolution: {integrity: sha512-vwzFiiy8Rn6E0MtA13/Cxxgpan/N6UeNYR9oUu6kuJWxu6zCk98trcDp8CBhbtaeuq9SykCmXkFr2lWLoPcvLg==}
+  /@types/node@20.8.6:
+    resolution: {integrity: sha512-eWO4K2Ji70QzKUqRy6oyJWUeB7+g2cRagT3T/nxYibYcT4y2BDL8lqolRXjTHmkZCdJfIPaY73KbJAZmcryxTQ==}
+    dependencies:
+      undici-types: 5.25.3
     dev: true
 
   /@types/offscreencanvas@2019.7.0:
@@ -1037,7 +1039,7 @@ packages:
       '@babel/plugin-transform-react-jsx-self': 7.22.5(@babel/core@7.22.9)
       '@babel/plugin-transform-react-jsx-source': 7.22.5(@babel/core@7.22.9)
       react-refresh: 0.14.0
-      vite: 4.4.8(@types/node@20.4.10)
+      vite: 4.4.8(@types/node@20.8.6)
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -1746,6 +1748,10 @@ packages:
     hasBin: true
     dev: true
 
+  /undici-types@5.25.3:
+    resolution: {integrity: sha512-Ga1jfYwRn7+cP9v8auvEXN1rX3sWqlayd4HP7OKk4mZWylEmu3KzXDUGrQUN6Ol7qo1gPvB2e5gX6udnyEPgdA==}
+    dev: true
+
   /update-browserslist-db@1.0.11(browserslist@4.21.9):
     resolution: {integrity: sha512-dCwEFf0/oT85M1fHBg4F0jtLwJrutGoHSQXCh7u4o2t1drG+c0a9Flnqww6XUKSfQMPpJBRjU8d4RXB09qtvaA==}
     hasBin: true
@@ -1798,7 +1804,7 @@ packages:
       - rollup
     dev: true
 
-  /vite@4.4.8(@types/node@20.4.10):
+  /vite@4.4.8(@types/node@20.8.6):
     resolution: {integrity: sha512-LONawOUUjxQridNWGQlNizfKH89qPigK36XhMI7COMGztz8KNY0JHim7/xDd71CZwGT4HtSRgI7Hy+RlhG0Gvg==}
     engines: {node: ^14.18.0 || >=16.0.0}
     hasBin: true
@@ -1826,7 +1832,7 @@ packages:
       terser:
         optional: true
     dependencies:
-      '@types/node': 20.4.10
+      '@types/node': 20.8.6
       esbuild: 0.18.17
       postcss: 8.4.27
       rollup: 3.27.1
