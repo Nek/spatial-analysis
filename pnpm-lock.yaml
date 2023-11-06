@@ -24,8 +24,8 @@ dependencies:
     specifier: ^3.5.1
     version: 3.5.1
   '@thi.ng/vectors':
-    specifier: ^7.7.2
-    version: 7.7.2
+    specifier: ^7.8.2
+    version: 7.8.2
   immer:
     specifier: ^10.0.2
     version: 10.0.2
@@ -810,6 +810,11 @@ packages:
     engines: {node: '>=12.7'}
     dev: false
 
+  /@thi.ng/api@8.9.6:
+    resolution: {integrity: sha512-9m+FS3klc3/3ehEy9FuLJdPI81rBWNxkAa24xiclNU7pShHyrSOdbiwFeKiVAFcLYW+fLhRomFEnTm80nncNuw==}
+    engines: {node: '>=12.7'}
+    dev: false
+
   /@thi.ng/arrays@2.5.15:
     resolution: {integrity: sha512-sMCB2nAGSugzrpWkt70N0zf6htvf9qssmiRq2eP9lHDSsUd2v7aeg3Ps++77yUJ6Mw4os9POi/55jvO4v9/Mpg==}
     engines: {node: '>=12.7'}
@@ -822,11 +827,23 @@ packages:
       '@thi.ng/random': 3.5.1
     dev: false
 
-  /@thi.ng/binary@3.3.28:
-    resolution: {integrity: sha512-AD7Kaa9+EYhCGKDAmlaxjs0dhU+4rGuMl6W5rWdJDcyX8bnDjMZy3+5UzlxfY/s6FEesdst5pGR/raE+SITRyA==}
+  /@thi.ng/arrays@2.7.2:
+    resolution: {integrity: sha512-vR+HxeJ88mGVHr1xXhrA+WmL1VBUZ5tFdlP/PqkOs38EbXvXT6CLmn7H0BmZhj0bOjdZDkWkxEmFreinr9ZUFw==}
     engines: {node: '>=12.7'}
     dependencies:
-      '@thi.ng/api': 8.9.0
+      '@thi.ng/api': 8.9.6
+      '@thi.ng/checks': 3.4.6
+      '@thi.ng/compare': 2.2.2
+      '@thi.ng/equiv': 2.1.31
+      '@thi.ng/errors': 2.4.0
+      '@thi.ng/random': 3.6.12
+    dev: false
+
+  /@thi.ng/binary@3.3.35:
+    resolution: {integrity: sha512-Q36MewH9mNCSl/m4MSlkbDdzke2I74we0akgl/fQE9qY7Uz1vf2Z/khIGuNW34DfLI9nvFAVMltWJs7woCiXeA==}
+    engines: {node: '>=12.7'}
+    dependencies:
+      '@thi.ng/api': 8.9.6
     dev: false
 
   /@thi.ng/checks@3.4.0:
@@ -836,6 +853,13 @@ packages:
       tslib: 2.6.1
     dev: false
 
+  /@thi.ng/checks@3.4.6:
+    resolution: {integrity: sha512-WiYzysSk826b8TgruFZaLYVxVeDLjg8liuqZKWb0QJM5wb0Si2sf/cGvvHcAnup+g5DUtyz2ib3XEzW9O5Lxtw==}
+    engines: {node: '>=12.7'}
+    dependencies:
+      tslib: 2.6.2
+    dev: false
+
   /@thi.ng/compare@2.1.33:
     resolution: {integrity: sha512-cscjOP0g7FUS0046F6KhbdPNVOTDQRB5hIa6t7a2bK6MpNpbEdw1x6hWpIcUt8KmSO+k4j/qgygPC/M32J3eYw==}
     engines: {node: '>=12.7'}
@@ -843,16 +867,28 @@ packages:
       '@thi.ng/api': 8.9.0
     dev: false
 
-  /@thi.ng/compose@2.1.35:
-    resolution: {integrity: sha512-25OwxKnT7zRO7u4TsytYPwUOPMX+IYKaW9DpzXQTcqe6TBBVgomZhXj2qKNCSzF48j/Ny6bRs7zr6SCtxgxfNg==}
+  /@thi.ng/compare@2.2.2:
+    resolution: {integrity: sha512-b/neQjSxWSkhAb38vE1yQhW1VOfJHKlyfuryXCJRHEmcJUtdaD1sFxyCo0VnbJk2PFcSqAJTwV5sxlhKYSmDog==}
     engines: {node: '>=12.7'}
     dependencies:
-      '@thi.ng/api': 8.9.0
-      '@thi.ng/errors': 2.3.0
+      '@thi.ng/api': 8.9.6
+    dev: false
+
+  /@thi.ng/compose@2.1.45:
+    resolution: {integrity: sha512-u4+0j4YOoOLyV1UPvJQQK/a+8MFh8MsvSP4I2ViyZ09vjdPQY8vC+LbbS1eZ8w4EQBtuGYXIi5g2nwfdS8O4WA==}
+    engines: {node: '>=12.7'}
+    dependencies:
+      '@thi.ng/api': 8.9.6
+      '@thi.ng/errors': 2.4.0
     dev: false
 
   /@thi.ng/equiv@2.1.25:
     resolution: {integrity: sha512-V+bytFqcYTYa6J+jB8lWS7pdS1jKBCBOAmoVSIwqojEuQAvzM1NZQ1QX3fsfuKy86eenAETJBdDHMnBYd/N5wA==}
+    engines: {node: '>=12.7'}
+    dev: false
+
+  /@thi.ng/equiv@2.1.31:
+    resolution: {integrity: sha512-EFyLyTnxL9zkWvXUT39+2RweZn1iq/zZAdRne4LkwBO5c8Psl3vxTpHxoe+WZQe3/iaGqJlNky9yauozkmdviQ==}
     engines: {node: '>=12.7'}
     dev: false
 
@@ -861,12 +897,17 @@ packages:
     engines: {node: '>=12.7'}
     dev: false
 
+  /@thi.ng/errors@2.4.0:
+    resolution: {integrity: sha512-B80KXWH/dCXoAg116CuVk2HCTt4EWMre3H5Tf+mhS7Kb4ao9P0CnqGWni07oDN/8p6sJqFM+PS0NCGD0JZDOnA==}
+    engines: {node: '>=12.7'}
+    dev: false
+
   /@thi.ng/geom-api@3.4.20:
     resolution: {integrity: sha512-lkMTtu9DHQKoExb2mgIM4XEqiI8YLOqSLMDRKaAxzWTCpVZsYuF9AxS2Tn1GQc8fwMQO+n2vggZLrCEPc59Xng==}
     engines: {node: '>=12.7'}
     dependencies:
       '@thi.ng/api': 8.9.0
-      '@thi.ng/vectors': 7.7.2
+      '@thi.ng/vectors': 7.8.2
     dev: false
 
   /@thi.ng/geom-closest-point@2.1.58:
@@ -875,7 +916,7 @@ packages:
     dependencies:
       '@thi.ng/api': 8.9.0
       '@thi.ng/math': 5.5.1
-      '@thi.ng/vectors': 7.7.2
+      '@thi.ng/vectors': 7.8.2
     dev: false
 
   /@thi.ng/geom-isec@2.1.62:
@@ -886,11 +927,16 @@ packages:
       '@thi.ng/geom-api': 3.4.20
       '@thi.ng/geom-closest-point': 2.1.58
       '@thi.ng/math': 5.5.1
-      '@thi.ng/vectors': 7.7.2
+      '@thi.ng/vectors': 7.8.2
     dev: false
 
   /@thi.ng/hex@2.3.12:
     resolution: {integrity: sha512-wd/YnwNbHJMF0c20IQA+8tvxCGaqgxvg5WkcMIsPqc801BYR8OiklGe2ySv4lnM10dQXoe8UbyojRUoUW2rT0A==}
+    engines: {node: '>=12.7'}
+    dev: false
+
+  /@thi.ng/hex@2.3.18:
+    resolution: {integrity: sha512-FGq/P7cfaTWCd+NsnRPTE0aRuB5r10Hma5Jkys+1UKEaVj3OYuCUa3s1dcOT4oMbOqXuUnqH2fxAtUqMRrcWtg==}
     engines: {node: '>=12.7'}
     dev: false
 
@@ -901,11 +947,18 @@ packages:
       '@thi.ng/api': 8.9.0
     dev: false
 
-  /@thi.ng/memoize@3.1.33:
-    resolution: {integrity: sha512-A039u2G6sz1aBgeRnASvD2xGM39/zig96Kqw+fH++B9ieqJBmgnA6xavI3CUeCaORLm9qYNrvBpRKs/oOerlyQ==}
+  /@thi.ng/math@5.7.1:
+    resolution: {integrity: sha512-JxkN8tkaVRL2s/bhEGXgfSMNvghry6yaAdhTZ8ZvmuX1hfl/0QP+ThRsZXsrct3SgP45TpjMv3lCN9l/NMNGEg==}
     engines: {node: '>=12.7'}
     dependencies:
-      '@thi.ng/api': 8.9.0
+      '@thi.ng/api': 8.9.6
+    dev: false
+
+  /@thi.ng/memoize@3.1.40:
+    resolution: {integrity: sha512-2cGHdbWOMsooBvSXZak1PUlvxY4W+0ZKXTewKQCC2ZD1C/ZNdOS54OugqdNgT/vvyeev9b5AH8nFBgrr8YVoDg==}
+    engines: {node: '>=12.7'}
+    dependencies:
+      '@thi.ng/api': 8.9.6
     dev: false
 
   /@thi.ng/random@3.5.1:
@@ -918,44 +971,54 @@ packages:
       '@thi.ng/hex': 2.3.12
     dev: false
 
-  /@thi.ng/strings@3.4.8:
-    resolution: {integrity: sha512-sAPTcUovXmunhFDRKh/aTlb8reLCgVCDGLYHSMYAP0ogstwQ8Yq0fC0WPcOmzVMyQTen0N8yXbOXDpjWqrxfOg==}
+  /@thi.ng/random@3.6.12:
+    resolution: {integrity: sha512-UqXQAr3HBJdHgIztOl3I5qXEly3FCuFFqtwBNEhC6+Fj55JgwvVZJJVqGVw1oeWjRH0kplDECkx0N/jQYYBeSA==}
     engines: {node: '>=12.7'}
     dependencies:
-      '@thi.ng/api': 8.9.0
-      '@thi.ng/errors': 2.3.0
-      '@thi.ng/hex': 2.3.12
-      '@thi.ng/memoize': 3.1.33
+      '@thi.ng/api': 8.9.6
+      '@thi.ng/checks': 3.4.6
+      '@thi.ng/errors': 2.4.0
+      '@thi.ng/hex': 2.3.18
     dev: false
 
-  /@thi.ng/transducers@8.5.0:
-    resolution: {integrity: sha512-UzZInwSEq4RJ3PTsBzPA+LsOkaiLfKsTuRS2OEGKzOFZuvnx5dM6/Jq7PLzm5ifXXMpmIEJfEMADcrmFiTsRgQ==}
+  /@thi.ng/strings@3.6.4:
+    resolution: {integrity: sha512-5xubFas8o8kdhwgQ2XTBbY96RFz2Jgjrqj9EG69BGn+y0lTjuajafwYG4yham9i49vTIFXBx8kebe0dEGj13fw==}
     engines: {node: '>=12.7'}
     dependencies:
-      '@thi.ng/api': 8.9.0
-      '@thi.ng/arrays': 2.5.15
-      '@thi.ng/checks': 3.4.0
-      '@thi.ng/compare': 2.1.33
-      '@thi.ng/compose': 2.1.35
-      '@thi.ng/errors': 2.3.0
-      '@thi.ng/math': 5.5.1
-      '@thi.ng/random': 3.5.1
+      '@thi.ng/api': 8.9.6
+      '@thi.ng/errors': 2.4.0
+      '@thi.ng/hex': 2.3.18
+      '@thi.ng/memoize': 3.1.40
     dev: false
 
-  /@thi.ng/vectors@7.7.2:
-    resolution: {integrity: sha512-5CGd+b1F72bs9wk86aeZX/QdagAvABi6k+IlNhj9VNxZPJ6xQ1Gre0REwY3+x5TSkL0hMgrGEIpc6W2K3scyGw==}
+  /@thi.ng/transducers@8.8.8:
+    resolution: {integrity: sha512-yyqkPUYacvMgYwvS5sUacOvpRXOXYpsC54X6uxH6V5Koe+RpUVvsDtKeLbF18UxT5TmoUseFZ6RAYH3zEUX2ew==}
     engines: {node: '>=12.7'}
     dependencies:
-      '@thi.ng/api': 8.9.0
-      '@thi.ng/binary': 3.3.28
-      '@thi.ng/checks': 3.4.0
-      '@thi.ng/equiv': 2.1.25
-      '@thi.ng/errors': 2.3.0
-      '@thi.ng/math': 5.5.1
-      '@thi.ng/memoize': 3.1.33
-      '@thi.ng/random': 3.5.1
-      '@thi.ng/strings': 3.4.8
-      '@thi.ng/transducers': 8.5.0
+      '@thi.ng/api': 8.9.6
+      '@thi.ng/arrays': 2.7.2
+      '@thi.ng/checks': 3.4.6
+      '@thi.ng/compare': 2.2.2
+      '@thi.ng/compose': 2.1.45
+      '@thi.ng/errors': 2.4.0
+      '@thi.ng/math': 5.7.1
+      '@thi.ng/random': 3.6.12
+    dev: false
+
+  /@thi.ng/vectors@7.8.2:
+    resolution: {integrity: sha512-EZ6sAyL1vgCrMZDrQeGo+8dosgvunUr8fujToONOCLgC1RF7f/wI9ZWPtVJKpc7x+/YtmqygnSpzariMBMVWxQ==}
+    engines: {node: '>=12.7'}
+    dependencies:
+      '@thi.ng/api': 8.9.6
+      '@thi.ng/binary': 3.3.35
+      '@thi.ng/checks': 3.4.6
+      '@thi.ng/equiv': 2.1.31
+      '@thi.ng/errors': 2.4.0
+      '@thi.ng/math': 5.7.1
+      '@thi.ng/memoize': 3.1.40
+      '@thi.ng/random': 3.6.12
+      '@thi.ng/strings': 3.6.4
+      '@thi.ng/transducers': 8.8.8
     dev: false
 
   /@tweenjs/tween.js@18.6.4:
@@ -1738,6 +1801,10 @@ packages:
 
   /tslib@2.6.1:
     resolution: {integrity: sha512-t0hLfiEKfMUoqhG+U1oid7Pva4bbDPHYfJNiB7BiIjRkj1pyC++4N3huJfqY6aRH6VTB0rvtzQwjM4K6qpfOig==}
+    dev: false
+
+  /tslib@2.6.2:
+    resolution: {integrity: sha512-AEYxH93jGFPn/a2iVAwW87VuUIkR1FVUKB77NwMF7nBTDkDrrT/Hpt/IrCJ0QXhW27jTBDcf5ZY7w6RiqTMw2Q==}
     dev: false
 
   /typescript@5.1.6:
